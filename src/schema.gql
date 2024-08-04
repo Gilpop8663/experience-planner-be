@@ -1,0 +1,139 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CheckEmailInput {
+  email: String!
+}
+
+type CheckEmailOutput {
+  error: String
+  ok: Boolean!
+}
+
+input CheckNicknameInput {
+  nickname: String!
+}
+
+type CheckNicknameOutput {
+  error: String
+  ok: Boolean!
+}
+
+input CreateAccountInput {
+  email: String!
+  nickname: String!
+  password: String!
+}
+
+type CreateAccountOutput {
+  error: String
+  ok: Boolean!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input DeleteAccountInput {
+  userId: Float!
+}
+
+type DeleteAccountOutput {
+  error: String
+  ok: Boolean!
+}
+
+input EditProfileInput {
+  nickname: String
+  password: String
+}
+
+type EditProfileOutput {
+  error: String
+  ok: Boolean!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+type ForgotPasswordOutput {
+  error: String
+  ok: Boolean!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LoginOutput {
+  error: String
+  ok: Boolean!
+  token: String
+}
+
+type Mutation {
+  checkEmail(input: CheckEmailInput!): CheckEmailOutput!
+  checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
+  createAccount(input: CreateAccountInput!): CreateAccountOutput!
+  deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
+  forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
+  login(input: LoginInput!): LoginOutput!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
+  sendVerifyEmail: SendVerifyEmailOutput!
+  verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
+}
+
+type Query {
+  editProfile(input: EditProfileInput!): EditProfileOutput!
+  getUserProfile(input: UserProfileInput!): UserProfileOutput!
+  me: User!
+}
+
+input ResetPasswordInput {
+  code: String!
+  newPassword: String!
+}
+
+type ResetPasswordOutput {
+  error: String
+  ok: Boolean!
+}
+
+type SendVerifyEmailOutput {
+  error: String
+  ok: Boolean!
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  id: Float!
+  nickname: String!
+  password: String!
+  point: Float!
+  updatedAt: DateTime!
+  verified: Boolean!
+}
+
+input UserProfileInput {
+  userId: Float!
+}
+
+type UserProfileOutput {
+  error: String
+  ok: Boolean!
+  user: User
+}
+
+input VerifyEmailInput {
+  code: String!
+}
+
+type VerifyEmailOutput {
+  error: String
+  ok: Boolean!
+}

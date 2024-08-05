@@ -21,6 +21,7 @@ test('강남맛집 링크를 입력해서 캠페인을 생성한다.', async () 
           ) {
             ok
             error
+            campaignId
           }
         }
       `,
@@ -35,6 +36,7 @@ test('강남맛집 링크를 입력해서 캠페인을 생성한다.', async () 
 
       expect(createCampaignFromLink.ok).toBe(true);
       expect(createCampaignFromLink.error).toBe(null);
+      expect(createCampaignFromLink.campaignId).toEqual(expect.any(Number));
     });
 
   const initialCampaign = await campaignRepository.findOne({

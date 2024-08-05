@@ -19,6 +19,8 @@ import { AuthModule } from './auth/auth.module';
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { PasswordResetToken } from './users/entities/passwordResetToken.entity';
+import { CampaignsModule } from './campaigns/campaigns.module';
+import { Campaign } from './campaigns/entities/campaign.entity';
 
 const getEnvFilePath = () => {
   if (process.env.NODE_ENV === 'dev') {
@@ -66,7 +68,7 @@ const getEnvFilePath = () => {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE_NAME,
           }),
-      entities: [User, Verification, PasswordResetToken],
+      entities: [User, Verification, PasswordResetToken, Campaign],
       logging: process.env.NODE_ENV === 'dev',
       synchronize: true,
     }),
@@ -89,6 +91,7 @@ const getEnvFilePath = () => {
       domain: process.env.MAILGUN_DOMAIN_NAME,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
     }),
+    CampaignsModule,
   ],
   controllers: [],
   providers: [],

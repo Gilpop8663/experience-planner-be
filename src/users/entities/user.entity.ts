@@ -12,6 +12,7 @@ import {
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEmail, IsNumber, Length } from 'class-validator';
 import { PasswordResetToken } from './passwordResetToken.entity';
+import { Campaign } from 'src/campaigns/entities/campaign.entity';
 
 @InputType({ isAbstract: true })
 @ObjectType()
@@ -43,9 +44,9 @@ export class User extends CoreEntity {
   @IsBoolean()
   verified: boolean;
 
-  // @Field(() => [Saga])
-  // @OneToMany(() => Saga, (saga) => saga.author)
-  // sagas: Saga[];
+  @Field(() => [Campaign])
+  @OneToMany(() => Campaign, (campaign) => campaign.user)
+  campaign: Campaign[];
 
   @OneToMany(() => PasswordResetToken, (token) => token.user)
   passwordResetTokens: PasswordResetToken[];

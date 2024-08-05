@@ -2,6 +2,25 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Campaign {
+  createdAt: DateTime!
+  detailedViewLink: String!
+  experienceType: ExperienceType!
+  extraAmount: Float!
+  id: Float!
+  isReserved: Boolean!
+  location: String!
+  platformName: String!
+  reservationDate: DateTime!
+  reviewDeadline: DateTime!
+  serviceAmount: Float!
+  serviceDetails: String!
+  thumbnailUrl: String!
+  title: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
 input CheckEmailInput {
   email: String!
 }
@@ -31,6 +50,17 @@ type CreateAccountOutput {
   ok: Boolean!
 }
 
+input CreateCampaignLinkInput {
+  linkUrl: String!
+  userId: Float!
+}
+
+type CreateCampaignLinkOutput {
+  campaignId: Float
+  error: String
+  ok: Boolean!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -53,6 +83,11 @@ input EditProfileInput {
 type EditProfileOutput {
   error: String
   ok: Boolean!
+}
+
+enum ExperienceType {
+  deliveryType
+  visitType
 }
 
 input ForgotPasswordInput {
@@ -79,6 +114,7 @@ type Mutation {
   checkEmail(input: CheckEmailInput!): CheckEmailOutput!
   checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
+  createCampaignFromLink(input: CreateCampaignLinkInput!): CreateCampaignLinkOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
@@ -109,6 +145,7 @@ type SendVerifyEmailOutput {
 }
 
 type User {
+  campaign: [Campaign!]!
   createdAt: DateTime!
   email: String!
   id: Float!

@@ -5,9 +5,17 @@ import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
 import { Verification } from './entities/verification.entity';
 import { PasswordResetToken } from './entities/passwordResetToken.entity';
+import { Campaign } from 'src/campaigns/entities/campaign.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Verification, PasswordResetToken])],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      Verification,
+      PasswordResetToken,
+      Campaign,
+    ]),
+  ],
   providers: [UsersService, UsersResolver],
   exports: [UsersService],
 })

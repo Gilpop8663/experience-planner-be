@@ -11,6 +11,7 @@
   },
   "setupFilesAfterEnv": [
     "<rootDir>/jest.setup.ts",
-    "<rootDir>/01-users.e2e-spec.ts"
+    "<rootDir>/01-users.e2e-spec.ts",
+    "<rootDir>/02-campaigns.e2e-spec"
   ]
 }

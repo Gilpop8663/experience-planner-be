@@ -6,10 +6,12 @@ import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PasswordResetToken } from 'src/users/entities/passwordResetToken.entity';
 import { MailService } from 'src/mail/mail.service';
+import { Campaign } from 'src/campaigns/entities/campaign.entity';
 
 let app: INestApplication;
 let dataSource: DataSource;
 let usersRepository: Repository<User>;
+let campaignRepository: Repository<Campaign>;
 let mailService: MailService;
 let passwordResetTokenRepository: Repository<PasswordResetToken>;
 
@@ -32,6 +34,9 @@ beforeAll(async () => {
   app = moduleFixture.createNestApplication();
   usersRepository = moduleFixture.get<Repository<User>>(
     getRepositoryToken(User),
+  );
+  campaignRepository = moduleFixture.get<Repository<Campaign>>(
+    getRepositoryToken(Campaign),
   );
   passwordResetTokenRepository = moduleFixture.get<
     Repository<PasswordResetToken>
@@ -65,6 +70,7 @@ export {
   app,
   dataSource,
   usersRepository,
+  campaignRepository,
   mailService,
   passwordResetTokenRepository,
 };

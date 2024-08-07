@@ -40,9 +40,9 @@ export class CampaignsService {
         campaign = await this.getGangnamMatzipCampaign(user, linkUrl);
       } else if (platformName === '레뷰') {
         campaign = await this.getRevuCampaign(user, linkUrl);
+      } else if (platformName === '리뷰노트') {
+        campaign = await this.getReviewNoteCampaign(user, linkUrl);
       }
-
-      console.log(campaign);
 
       await this.campaignRepository.save(campaign);
 
@@ -59,6 +59,7 @@ export class CampaignsService {
     const SITE_NAME = {
       강남맛집: 'xn--939au0g4vj8sq',
       레뷰: 'www.revu.net',
+      리뷰노트: 'reviewnote',
     };
 
     if (parsedLinkUrl.includes(SITE_NAME.강남맛집)) {
@@ -67,6 +68,10 @@ export class CampaignsService {
 
     if (parsedLinkUrl.includes(SITE_NAME.레뷰)) {
       return '레뷰';
+    }
+
+    if (parsedLinkUrl.includes(SITE_NAME.리뷰노트)) {
+      return '리뷰노트';
     }
   }
 
@@ -96,6 +101,54 @@ export class CampaignsService {
       title,
       detailedViewLink: linkUrl,
       platformName: '강남맛집',
+      thumbnailUrl,
+      experienceType,
+      reviewDeadline,
+      serviceDetails,
+      location,
+    });
+
+    return campaign;
+  }
+
+  async getReviewNoteCampaign(user: User, linkUrl: string) {
+    const response = await axios.get(linkUrl, {
+      headers: {
+        setUserAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+      },
+    });
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const title = $('div.text-lg', 'div.w-full').eq(0).text().trim();
+
+    const thumbnailUrl = '';
+    const experienceType = $('.pr-4', '.flex.items-center.space-x-2')
+      .text()
+      .includes('방문형')
+      ? ExperienceType.visitType
+      : ExperienceType.deliveryType;
+    const deadlineString = $('div.col-span-7').text().split(' ');
+    const parsedDeadlineString = (
+      deadlineString[0] +
+      deadlineString[2] +
+      deadlineString[3]
+    ).replaceAll('/', '.');
+
+    const reviewDeadline = this.getDeadlineDate(parsedDeadlineString);
+    const serviceDetails = $('p.p-space', 'div.w-full').text().trim();
+    const location = $('div.text-lg:contains("방문 주소")')
+      .next()
+      .text()
+      .trim();
+
+    const campaign = this.campaignRepository.create({
+      user,
+      title,
+      detailedViewLink: linkUrl,
+      platformName: '리뷰노트',
       thumbnailUrl,
       experienceType,
       reviewDeadline,

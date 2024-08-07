@@ -9,6 +9,7 @@
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   },
+  "preset": "jest-puppeteer",
   "setupFilesAfterEnv": [
     "<rootDir>/jest.setup.ts",
     "<rootDir>/01-users.e2e-spec.ts",

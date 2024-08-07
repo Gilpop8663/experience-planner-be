@@ -21,6 +21,8 @@ export class CampaignsService {
     private userRepository: Repository<User>,
   ) {}
 
+  async createCampaignFromSelf({}) {}
+
   async createCampaignFromLink({
     linkUrl,
     userId,

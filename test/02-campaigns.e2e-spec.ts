@@ -56,3 +56,62 @@ test.each([
     expect(initialCampaign).toBeDefined();
   },
 );
+
+test.each([
+  ['제목1', '참고 링크1', '플랫폼1', '08.26', '참고 사항1', '주소1'],
+  ['제목2', '참고 링크2', '플랫폼2', '08.29', '참고 사항2', '주소2'],
+])(
+  '직접 내용을 입력해서 캠페인을 생성한다.',
+  async (
+    title,
+    linkUrl,
+    platformName,
+    reviewDeadline,
+    serviceDetails,
+    location,
+  ) => {
+    const [initialUser] = await usersRepository.find();
+
+    await request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query: /* GraphQL */ `
+        mutation {
+          createCampaignDirectly(
+            input: {
+              title: "${title}" 
+              platformName: "${platformName}" 
+              reviewDeadline: "${reviewDeadline}" 
+              serviceDetails: "${serviceDetails}" 
+              location: "${location}" 
+              linkUrl: "${linkUrl}"
+              userId: ${initialUser.id}
+            }
+          ) {
+            ok
+            error
+            campaignId
+          }
+        }
+      `,
+      })
+      .expect(200)
+      .expect((res) => {
+        const {
+          body: {
+            data: { createCampaignFromLink },
+          },
+        } = res;
+
+        expect(createCampaignFromLink.ok).toBe(true);
+        expect(createCampaignFromLink.error).toBe(null);
+        expect(createCampaignFromLink.campaignId).toEqual(expect.any(Number));
+      });
+
+    const initialCampaign = await campaignRepository.findOne({
+      where: { detailedViewLink: linkUrl },
+    });
+
+    expect(initialCampaign).toBeDefined();
+  },
+);

@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { logErrorAndReturnFalse } from 'src/utils';
-import { Campaign, ExperienceType } from './entities/campaign.entity';
+import { Campaign } from './entities/campaign.entity';
 import {
   CreateCampaignLinkInput,
   CreateCampaignLinkOutput,
@@ -42,6 +42,8 @@ export class CampaignsService {
         campaign = await this.getRevuCampaign(user, linkUrl);
       } else if (platformName === '리뷰노트') {
         campaign = await this.getReviewNoteCampaign(user, linkUrl);
+      } else if (platformName === '미블') {
+        campaign = await this.getMrblogCampaign(user, linkUrl);
       }
 
       await this.campaignRepository.save(campaign);
@@ -60,6 +62,7 @@ export class CampaignsService {
       강남맛집: 'xn--939au0g4vj8sq',
       레뷰: 'www.revu.net',
       리뷰노트: 'reviewnote',
+      미블: 'mrblog',
     };
 
     if (parsedLinkUrl.includes(SITE_NAME.강남맛집)) {
@@ -72,6 +75,10 @@ export class CampaignsService {
 
     if (parsedLinkUrl.includes(SITE_NAME.리뷰노트)) {
       return '리뷰노트';
+    }
+
+    if (parsedLinkUrl.includes(SITE_NAME.미블)) {
+      return '미블';
     }
   }
 
@@ -88,10 +95,6 @@ export class CampaignsService {
 
     const title = $('.tit', '.textArea').text().trim();
     const thumbnailUrl = $('#img').attr('src');
-    const experienceType =
-      $('.type').text() === '방문형'
-        ? ExperienceType.visitType
-        : ExperienceType.deliveryType;
     const reviewDeadline = this.getDeadlineDate($('dd', '.on').text());
     const serviceDetails = $('.sub_tit', '.textArea').text().trim();
     const location = $('#cont_map').next().text().trim();
@@ -102,7 +105,46 @@ export class CampaignsService {
       detailedViewLink: linkUrl,
       platformName: '강남맛집',
       thumbnailUrl,
-      experienceType,
+      reviewDeadline,
+      serviceDetails,
+      location,
+    });
+
+    return campaign;
+  }
+
+  async getMrblogCampaign(user: User, linkUrl: string) {
+    const response = await axios.get(linkUrl, {
+      headers: {
+        setUserAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
+      },
+    });
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const title = $('strong.subject', '.sticky_box').text().trim();
+    const thumbnailUrl = $('img', '.main_img').attr('src');
+    const deadlineString = $('dt:contains("리뷰 기간")', '.info_row')
+      .next()
+      .text()
+      .split('~')
+
+      .map((item) => {
+        return item.trim().slice(5);
+      })
+      .join('~');
+    const reviewDeadline = this.getDeadlineDate(deadlineString);
+    const serviceDetails = $('.data').eq(2).text().trim();
+    const location = $('.map_area').next('.data').text().trim();
+
+    const campaign = this.campaignRepository.create({
+      user,
+      title,
+      detailedViewLink: linkUrl,
+      platformName: '미블',
+      thumbnailUrl,
       reviewDeadline,
       serviceDetails,
       location,
@@ -123,13 +165,7 @@ export class CampaignsService {
     const $ = cheerio.load(html);
 
     const title = $('div.text-lg', 'div.w-full').eq(0).text().trim();
-
     const thumbnailUrl = '';
-    const experienceType = $('.pr-4', '.flex.items-center.space-x-2')
-      .text()
-      .includes('방문형')
-      ? ExperienceType.visitType
-      : ExperienceType.deliveryType;
     const deadlineString = $('div.col-span-7').text().split(' ');
     const parsedDeadlineString = (
       deadlineString[0] +
@@ -150,7 +186,6 @@ export class CampaignsService {
       detailedViewLink: linkUrl,
       platformName: '리뷰노트',
       thumbnailUrl,
-      experienceType,
       reviewDeadline,
       serviceDetails,
       location,
@@ -180,10 +215,6 @@ export class CampaignsService {
 
     const title = $('h2').text().trim();
     const thumbnailUrl = $('.campaign-title-img').attr('src');
-    const experienceType =
-      $('.vat').text() === '방문 및 예약안내'
-        ? ExperienceType.visitType
-        : ExperienceType.deliveryType;
     const reviewDeadline = this.getDeadlineDate(
       $('.con.ng-binding').eq(2).text(),
     );
@@ -196,7 +227,6 @@ export class CampaignsService {
       detailedViewLink: linkUrl,
       platformName: '레뷰',
       thumbnailUrl,
-      experienceType,
       reviewDeadline,
       serviceDetails,
       location,

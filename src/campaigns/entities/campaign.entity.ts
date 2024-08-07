@@ -1,20 +1,8 @@
-import {
-  Field,
-  InputType,
-  ObjectType,
-  registerEnumType,
-} from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { IsEnum, IsNumber, IsString, Length } from 'class-validator';
+import { IsNumber, IsString, Length } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
-
-export enum ExperienceType {
-  visitType = 'visitType',
-  deliveryType = 'deliveryType',
-}
-
-registerEnumType(ExperienceType, { name: 'ExperienceType' });
 
 @InputType({ isAbstract: true })
 @ObjectType()
@@ -38,11 +26,6 @@ export class Campaign extends CoreEntity {
   @Field(() => String)
   @IsString()
   thumbnailUrl: string;
-
-  @Column({ enum: ExperienceType, type: 'enum' })
-  @Field(() => ExperienceType)
-  @IsEnum(ExperienceType)
-  experienceType: ExperienceType;
 
   @Field(() => Boolean)
   isReserved: boolean;

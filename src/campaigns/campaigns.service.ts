@@ -16,6 +16,7 @@ import {
   CreateCampaignDirectlyOutput,
 } from './dtos/create-campaign-directly.dto';
 import { PLATFORM_NAME } from './constants';
+import { DeleteCampaignInput } from './dtos/delete-campaign.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -297,15 +298,15 @@ export class CampaignsService {
     return koreanEndDate;
   }
 
-  // async deleteSaga({ sagaId }: DeleteSagaInput) {
-  //   try {
-  //     this.sagaRepository.delete({ id: sagaId });
+  async deleteCampaign({ campaignId }: DeleteCampaignInput) {
+    try {
+      await this.campaignRepository.delete({ id: campaignId });
 
-  //     return { ok: true };
-  //   } catch (error) {
-  //     return { ok: false, error: '시리즈 삭제에 실패했습니다.' };
-  //   }
-  // }
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: '캠페인 삭제에 실패했습니다.' };
+    }
+  }
 
   // async editSaga({
   //   sagaId,

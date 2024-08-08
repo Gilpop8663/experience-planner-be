@@ -8,6 +8,10 @@ import {
   CreateCampaignDirectlyInput,
   CreateCampaignDirectlyOutput,
 } from './dtos/create-campaign-directly.dto';
+import {
+  DeleteCampaignInput,
+  DeleteCampaignOutput,
+} from './dtos/delete-campaign.dto';
 
 @Resolver()
 export class CampaignsResolver {
@@ -23,10 +27,10 @@ export class CampaignsResolver {
     return this.campaignService.createCampaignDirectly(input);
   }
 
-  // @Mutation(() => DeleteSagaOutput)
-  // deleteSaga(@Args('input') deleteSagaInput: DeleteSagaInput) {
-  //   return this.sagaService.deleteSaga(deleteSagaInput);
-  // }
+  @Mutation(() => DeleteCampaignOutput)
+  deleteCampaign(@Args('input') input: DeleteCampaignInput) {
+    return this.campaignService.deleteCampaign(input);
+  }
 
   // @Mutation(() => EditSagaOutput)
   // editSaga(@Args('input') editSagaInput: EditSagaInput) {

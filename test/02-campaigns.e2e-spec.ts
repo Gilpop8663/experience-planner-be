@@ -117,14 +117,14 @@ test.each([
 );
 
 test('캠페인을 삭제할 수 있다. ', async () => {
-  const [campaign] = await campaignRepository.find();
+  const [campaign] = await campaignRepository.find({ relations: ['user'] });
 
   await request(app.getHttpServer())
     .post(GRAPHQL_ENDPOINT)
     .send({
       query: /* GraphQL */ `
       mutation {
-        deleteCampaign(input: { campaignId : ${campaign.id} }) {
+        deleteCampaign(input: { campaignId : ${campaign.id}}) {
           ok
           error
         }
@@ -143,9 +143,9 @@ test('캠페인을 삭제할 수 있다. ', async () => {
       expect(deleteCampaign.error).toBe(null);
     });
 
-  const deletedCampaign = campaignRepository.findOne({
+  const deletedCampaign = await campaignRepository.findOne({
     where: { id: campaign.id },
   });
 
-  expect(deletedCampaign).toBeUndefined();
+  expect(deletedCampaign).toBeNull();
 });

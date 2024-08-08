@@ -90,6 +90,15 @@ type DeleteAccountOutput {
   ok: Boolean!
 }
 
+input DeleteCampaignInput {
+  campaignId: Float!
+}
+
+type DeleteCampaignOutput {
+  error: String
+  ok: Boolean!
+}
+
 input EditProfileInput {
   nickname: String
   password: String
@@ -127,6 +136,7 @@ type Mutation {
   createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
   createCampaignFromLink(input: CreateCampaignLinkInput!): CreateCampaignLinkOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
+  deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!

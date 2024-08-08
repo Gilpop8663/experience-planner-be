@@ -3,7 +3,12 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Campaign } from '../entities/campaign.entity';
 
 @InputType()
-export class CreateCampaignLinkInput extends PickType(Campaign, [
+export class CreateCampaignDirectlyInput extends PickType(Campaign, [
+  'title',
+  'location',
+  'platformName',
+  'serviceDetails',
+  'reviewDeadline',
   'detailedViewLink',
 ]) {
   @Field(() => Number)
@@ -11,7 +16,7 @@ export class CreateCampaignLinkInput extends PickType(Campaign, [
 }
 
 @ObjectType()
-export class CreateCampaignLinkOutput extends CoreOutput {
+export class CreateCampaignDirectlyOutput extends CoreOutput {
   @Field(() => Number, { nullable: true })
   campaignId?: number;
 }

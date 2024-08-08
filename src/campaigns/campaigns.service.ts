@@ -11,6 +11,11 @@ import {
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
+import {
+  CreateCampaignDirectlyInput,
+  CreateCampaignDirectlyOutput,
+} from './dtos/create-campaign-directly.dto';
+import { PLATFORM_NAME } from './constants';
 
 @Injectable()
 export class CampaignsService {
@@ -21,14 +26,47 @@ export class CampaignsService {
     private userRepository: Repository<User>,
   ) {}
 
-  async createCampaignFromSelf({}) {}
+  async createCampaignDirectly({
+    title,
+    reviewDeadline,
+    location,
+    platformName,
+    serviceDetails,
+    userId,
+    detailedViewLink,
+  }: CreateCampaignDirectlyInput): Promise<CreateCampaignDirectlyOutput> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!user) {
+        return { ok: false, error: '유저가 존재하지 않습니다.' };
+      }
+
+      const campaign = this.campaignRepository.create({
+        title,
+        reviewDeadline,
+        thumbnailUrl: '',
+        location,
+        platformName,
+        serviceDetails,
+        detailedViewLink,
+        user,
+      });
+
+      await this.campaignRepository.save(campaign);
+
+      return { ok: true, campaignId: campaign.id };
+    } catch (error) {
+      return logErrorAndReturnFalse(error, '캠페인 생성에 실패했습니다.');
+    }
+  }
 
   async createCampaignFromLink({
-    linkUrl,
+    detailedViewLink,
     userId,
   }: CreateCampaignLinkInput): Promise<CreateCampaignLinkOutput> {
     try {
-      const platformName = this.getPlatformName(linkUrl);
+      const platformName = this.getPlatformName(detailedViewLink);
 
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -38,14 +76,14 @@ export class CampaignsService {
 
       let campaign: Campaign;
 
-      if (platformName === '강남맛집') {
-        campaign = await this.getGangnamMatzipCampaign(user, linkUrl);
-      } else if (platformName === '레뷰') {
-        campaign = await this.getRevuCampaign(user, linkUrl);
-      } else if (platformName === '리뷰노트') {
-        campaign = await this.getReviewNoteCampaign(user, linkUrl);
-      } else if (platformName === '미블') {
-        campaign = await this.getMrblogCampaign(user, linkUrl);
+      if (platformName === PLATFORM_NAME.강남맛집) {
+        campaign = await this.getGangnamMatzipCampaign(user, detailedViewLink);
+      } else if (platformName === PLATFORM_NAME.레뷰) {
+        campaign = await this.getRevuCampaign(user, detailedViewLink);
+      } else if (platformName === PLATFORM_NAME.리뷰노트) {
+        campaign = await this.getReviewNoteCampaign(user, detailedViewLink);
+      } else if (platformName === PLATFORM_NAME.미블) {
+        campaign = await this.getMrblogCampaign(user, detailedViewLink);
       }
 
       await this.campaignRepository.save(campaign);
@@ -68,19 +106,19 @@ export class CampaignsService {
     };
 
     if (parsedLinkUrl.includes(SITE_NAME.강남맛집)) {
-      return '강남맛집';
+      return PLATFORM_NAME.강남맛집;
     }
 
     if (parsedLinkUrl.includes(SITE_NAME.레뷰)) {
-      return '레뷰';
+      return PLATFORM_NAME.레뷰;
     }
 
     if (parsedLinkUrl.includes(SITE_NAME.리뷰노트)) {
-      return '리뷰노트';
+      return PLATFORM_NAME.리뷰노트;
     }
 
     if (parsedLinkUrl.includes(SITE_NAME.미블)) {
-      return '미블';
+      return PLATFORM_NAME.미블;
     }
   }
 
@@ -105,7 +143,7 @@ export class CampaignsService {
       user,
       title,
       detailedViewLink: linkUrl,
-      platformName: '강남맛집',
+      platformName: PLATFORM_NAME.강남맛집,
       thumbnailUrl,
       reviewDeadline,
       serviceDetails,
@@ -145,7 +183,7 @@ export class CampaignsService {
       user,
       title,
       detailedViewLink: linkUrl,
-      platformName: '미블',
+      platformName: PLATFORM_NAME.미블,
       thumbnailUrl,
       reviewDeadline,
       serviceDetails,
@@ -186,7 +224,7 @@ export class CampaignsService {
       user,
       title,
       detailedViewLink: linkUrl,
-      platformName: '리뷰노트',
+      platformName: PLATFORM_NAME.리뷰노트,
       thumbnailUrl,
       reviewDeadline,
       serviceDetails,
@@ -227,7 +265,7 @@ export class CampaignsService {
       user,
       title,
       detailedViewLink: linkUrl,
-      platformName: '레뷰',
+      platformName: PLATFORM_NAME.레뷰,
       thumbnailUrl,
       reviewDeadline,
       serviceDetails,

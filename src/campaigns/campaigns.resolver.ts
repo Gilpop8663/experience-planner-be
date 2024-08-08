@@ -4,6 +4,10 @@ import {
   CreateCampaignLinkInput,
   CreateCampaignLinkOutput,
 } from './dtos/create-campaign-link.dto';
+import {
+  CreateCampaignDirectlyInput,
+  CreateCampaignDirectlyOutput,
+} from './dtos/create-campaign-directly.dto';
 
 @Resolver()
 export class CampaignsResolver {
@@ -12,6 +16,11 @@ export class CampaignsResolver {
   @Mutation(() => CreateCampaignLinkOutput)
   createCampaignFromLink(@Args('input') input: CreateCampaignLinkInput) {
     return this.campaignService.createCampaignFromLink(input);
+  }
+
+  @Mutation(() => CreateCampaignDirectlyOutput)
+  createCampaignDirectly(@Args('input') input: CreateCampaignDirectlyInput) {
+    return this.campaignService.createCampaignDirectly(input);
   }
 
   // @Mutation(() => DeleteSagaOutput)

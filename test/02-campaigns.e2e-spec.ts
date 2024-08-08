@@ -15,7 +15,7 @@ test.each([
   ['미블', '배송형', 'https://www.mrblog.net/campaigns/752638'],
 ])(
   '%s 링크를 입력해서 %s 캠페인을 생성한다.',
-  async (platformName, deliveryType, linkUrl) => {
+  async (platformName, deliveryType, detailedViewLink) => {
     const [initialUser] = await usersRepository.find();
 
     await request(app.getHttpServer())
@@ -25,7 +25,7 @@ test.each([
         mutation {
           createCampaignFromLink(
             input: {
-              linkUrl: "${linkUrl}"
+              detailedViewLink: "${detailedViewLink}"
               userId: ${initialUser.id}
             }
           ) {
@@ -50,7 +50,7 @@ test.each([
       });
 
     const initialCampaign = await campaignRepository.findOne({
-      where: { detailedViewLink: linkUrl },
+      where: { detailedViewLink },
     });
 
     expect(initialCampaign).toBeDefined();
@@ -58,13 +58,13 @@ test.each([
 );
 
 test.each([
-  ['제목1', '참고 링크1', '플랫폼1', '08.26', '참고 사항1', '주소1'],
-  ['제목2', '참고 링크2', '플랫폼2', '08.29', '참고 사항2', '주소2'],
+  ['제목1', '참고 링크1', '플랫폼1', new Date(), '참고 사항1', '주소1'],
+  ['제목2', '참고 링크2', '플랫폼2', new Date(), '참고 사항2', '주소2'],
 ])(
   '직접 내용을 입력해서 캠페인을 생성한다.',
   async (
     title,
-    linkUrl,
+    detailedViewLink,
     platformName,
     reviewDeadline,
     serviceDetails,
@@ -84,7 +84,7 @@ test.each([
               reviewDeadline: "${reviewDeadline}" 
               serviceDetails: "${serviceDetails}" 
               location: "${location}" 
-              linkUrl: "${linkUrl}"
+              detailedViewLink: "${detailedViewLink}"
               userId: ${initialUser.id}
             }
           ) {
@@ -99,17 +99,17 @@ test.each([
       .expect((res) => {
         const {
           body: {
-            data: { createCampaignFromLink },
+            data: { createCampaignDirectly },
           },
         } = res;
 
-        expect(createCampaignFromLink.ok).toBe(true);
-        expect(createCampaignFromLink.error).toBe(null);
-        expect(createCampaignFromLink.campaignId).toEqual(expect.any(Number));
+        expect(createCampaignDirectly.ok).toBe(true);
+        expect(createCampaignDirectly.error).toBe(null);
+        expect(createCampaignDirectly.campaignId).toEqual(expect.any(Number));
       });
 
     const initialCampaign = await campaignRepository.findOne({
-      where: { detailedViewLink: linkUrl },
+      where: { detailedViewLink },
     });
 
     expect(initialCampaign).toBeDefined();

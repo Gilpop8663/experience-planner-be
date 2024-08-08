@@ -49,8 +49,24 @@ type CreateAccountOutput {
   ok: Boolean!
 }
 
+input CreateCampaignDirectlyInput {
+  detailedViewLink: String!
+  location: String!
+  platformName: String!
+  reviewDeadline: DateTime!
+  serviceDetails: String!
+  title: String!
+  userId: Float!
+}
+
+type CreateCampaignDirectlyOutput {
+  campaignId: Float
+  error: String
+  ok: Boolean!
+}
+
 input CreateCampaignLinkInput {
-  linkUrl: String!
+  detailedViewLink: String!
   userId: Float!
 }
 
@@ -108,6 +124,7 @@ type Mutation {
   checkEmail(input: CheckEmailInput!): CheckEmailOutput!
   checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
+  createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
   createCampaignFromLink(input: CreateCampaignLinkInput!): CreateCampaignLinkOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!

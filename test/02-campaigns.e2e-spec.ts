@@ -58,8 +58,8 @@ test.each([
 );
 
 test.each([
-  ['제목1', '참고 링크1', '플랫폼1', new Date(), '참고 사항1', '주소1'],
-  ['제목2', '참고 링크2', '플랫폼2', new Date(), '참고 사항2', '주소2'],
+  ['제목1', '참고 링크1', '플랫폼1', new Date(), '참고 사항1', '주소1', 100],
+  ['제목2', '참고 링크2', '플랫폼2', new Date(), '참고 사항2', '주소2', 1000],
 ])(
   '직접 내용을 입력해서 캠페인을 생성한다.',
   async (
@@ -69,6 +69,7 @@ test.each([
     reviewDeadline,
     serviceDetails,
     location,
+    serviceAmount,
   ) => {
     const [initialUser] = await usersRepository.find();
 
@@ -85,6 +86,7 @@ test.each([
               serviceDetails: "${serviceDetails}" 
               location: "${location}" 
               detailedViewLink: "${detailedViewLink}"
+              serviceAmount: "${serviceAmount}"
               userId: ${initialUser.id}
             }
           ) {
@@ -148,4 +150,65 @@ test('캠페인을 삭제할 수 있다. ', async () => {
   });
 
   expect(deletedCampaign).toBeNull();
+});
+
+test('캠페인을 수정할 수 있다. ', async () => {
+  const [campaign] = await campaignRepository.find({ relations: ['user'] });
+
+  const EDIT = {
+    title: '제목1',
+    detailedViewLink: '참고 링크1',
+    platformName: '플랫폼1',
+    reviewDeadline: new Date(),
+    serviceDetails: '참고 사항1',
+    location: '주소1',
+    serviceAmount: 100,
+    extraAmount: 500,
+  };
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+       mutation {
+        editCampaign(input: { 
+              campaignId : ${campaign.id},
+              title: "${EDIT.title}" 
+              platformName: "${EDIT.platformName}" 
+              reviewDeadline: "${EDIT.reviewDeadline}" 
+              serviceDetails: "${EDIT.serviceDetails}" 
+              location: "${EDIT.location}" 
+              detailedViewLink: "${EDIT.detailedViewLink}"
+              serviceAmount: "${EDIT.serviceAmount}"
+              extraAmount: "${EDIT.extraAmount}"
+               }) {
+          ok
+          error
+        }
+      }`,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { editCampaign },
+        },
+      } = res;
+
+      expect(editCampaign.ok).toBe(true);
+      expect(editCampaign.error).toBe(null);
+    });
+
+  const editedCampaign = await campaignRepository.findOne({
+    where: { id: campaign.id },
+  });
+
+  expect(editedCampaign.title).toBe(EDIT.title);
+  expect(editedCampaign.detailedViewLink).toBe(EDIT.detailedViewLink);
+  expect(editedCampaign.location).toBe(EDIT.location);
+  expect(editedCampaign.platformName).toBe(EDIT.platformName);
+  expect(editedCampaign.reviewDeadline).toBe(EDIT.reviewDeadline);
+  expect(editedCampaign.serviceDetails).toBe(EDIT.serviceDetails);
+  expect(editedCampaign.serviceAmount).toBe(EDIT.serviceAmount);
+  expect(editedCampaign.extraAmount).toBe(EDIT.extraAmount);
 });

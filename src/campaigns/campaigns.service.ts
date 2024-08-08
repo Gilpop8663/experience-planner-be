@@ -35,6 +35,7 @@ export class CampaignsService {
     serviceDetails,
     userId,
     detailedViewLink,
+    serviceAmount,
   }: CreateCampaignDirectlyInput): Promise<CreateCampaignDirectlyOutput> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -51,6 +52,7 @@ export class CampaignsService {
         platformName,
         serviceDetails,
         detailedViewLink,
+        serviceAmount,
         user,
       });
 

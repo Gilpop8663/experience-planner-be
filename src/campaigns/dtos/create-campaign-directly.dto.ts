@@ -10,6 +10,7 @@ export class CreateCampaignDirectlyInput extends PickType(Campaign, [
   'serviceDetails',
   'reviewDeadline',
   'detailedViewLink',
+  'serviceAmount',
 ]) {
   @Field(() => Number)
   userId: number;

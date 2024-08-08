@@ -115,3 +115,37 @@ test.each([
     expect(initialCampaign).toBeDefined();
   },
 );
+
+test('캠페인을 삭제할 수 있다. ', async () => {
+  const [campaign] = await campaignRepository.find();
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+      mutation {
+        deleteCampaign(input: { campaignId : ${campaign.id} }) {
+          ok
+          error
+        }
+      }
+    `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { deleteCampaign },
+        },
+      } = res;
+
+      expect(deleteCampaign.ok).toBe(true);
+      expect(deleteCampaign.error).toBe(null);
+    });
+
+  const deletedCampaign = campaignRepository.findOne({
+    where: { id: campaign.id },
+  });
+
+  expect(deletedCampaign).toBeUndefined();
+});

@@ -16,7 +16,14 @@ import {
   CreateCampaignDirectlyOutput,
 } from './dtos/create-campaign-directly.dto';
 import { PLATFORM_NAME } from './constants';
-import { DeleteCampaignInput } from './dtos/delete-campaign.dto';
+import {
+  DeleteCampaignInput,
+  DeleteCampaignOutput,
+} from './dtos/delete-campaign.dto';
+import {
+  EditCampaignInput,
+  EditCampaignOutput,
+} from './dtos/edit-campaign.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -138,7 +145,11 @@ export class CampaignsService {
 
     const title = $('.tit', '.textArea').text().trim();
     const thumbnailUrl = $('#img').attr('src');
-    const reviewDeadline = this.getDeadlineDate($('dd', '.on').text());
+    const deadlineString = $('dt:contains("리뷰 등록기간")')
+      .next()
+      .text()
+      .trim();
+    const reviewDeadline = this.getDeadlineDate(deadlineString);
     const serviceDetails = $('.sub_tit', '.textArea').text().trim();
     const location = $('#cont_map').next().text().trim();
 
@@ -300,7 +311,9 @@ export class CampaignsService {
     return koreanEndDate;
   }
 
-  async deleteCampaign({ campaignId }: DeleteCampaignInput) {
+  async deleteCampaign({
+    campaignId,
+  }: DeleteCampaignInput): Promise<DeleteCampaignOutput> {
     try {
       await this.campaignRepository.delete({ id: campaignId });
 
@@ -310,20 +323,36 @@ export class CampaignsService {
     }
   }
 
-  // async editSaga({
-  //   sagaId,
-  //   description,
-  //   thumbnailUrl,
-  //   title,
-  // }: EditSagaInput): Promise<EditSagaOutput> {
-  //   try {
-  //     this.sagaRepository.update(sagaId, { title, thumbnailUrl, description });
+  async editCampaign({
+    campaignId,
+    title,
+    location,
+    extraAmount,
+    platformName,
+    serviceAmount,
+    serviceDetails,
+    reviewDeadline,
+    detailedViewLink,
+    reservationDate,
+  }: EditCampaignInput): Promise<EditCampaignOutput> {
+    try {
+      await this.campaignRepository.update(campaignId, {
+        title,
+        location,
+        platformName,
+        extraAmount,
+        serviceDetails,
+        serviceAmount,
+        reviewDeadline,
+        detailedViewLink,
+        reservationDate,
+      });
 
-  //     return { ok: true };
-  //   } catch (error) {
-  //     return { ok: false, error: '시리즈 수정에 실패했습니다.' };
-  //   }
-  // }
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: '시리즈 수정에 실패했습니다.' };
+    }
+  }
 
   // async completeSaga({
   //   sagaId,

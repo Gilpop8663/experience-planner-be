@@ -58,8 +58,29 @@ test.each([
 );
 
 test.each([
-  ['제목1', '참고 링크1', '플랫폼1', new Date(), '참고 사항1', '주소1', 100],
-  ['제목2', '참고 링크2', '플랫폼2', new Date(), '참고 사항2', '주소2', 1000],
+  [
+    '제목1',
+    '참고 링크1',
+    '플랫폼1',
+    new Date(),
+    '참고 사항1',
+    '주소1',
+    100,
+    0,
+    new Date(),
+  ],
+  [
+    '제목2',
+    '참고 링크2',
+    '플랫폼2',
+    new Date(),
+    '참고 사항2',
+    '주소2',
+    1000,
+    20,
+    new Date(),
+  ],
+  ['제목3', '', '', new Date(), '', '', 0, 0, ''],
 ])(
   '직접 내용을 입력해서 캠페인을 생성한다.',
   async (
@@ -70,6 +91,8 @@ test.each([
     serviceDetails,
     location,
     serviceAmount,
+    extraAmount,
+    reservationDate,
   ) => {
     const [initialUser] = await usersRepository.find();
 
@@ -86,8 +109,10 @@ test.each([
               serviceDetails: "${serviceDetails}" 
               location: "${location}" 
               detailedViewLink: "${detailedViewLink}"
-              serviceAmount: "${serviceAmount}"
+              serviceAmount: ${serviceAmount}
               userId: ${initialUser.id}
+              extraAmount: ${extraAmount}
+              reservationDate: "${reservationDate}"
             }
           ) {
             ok
@@ -160,6 +185,7 @@ test('캠페인을 수정할 수 있다. ', async () => {
     detailedViewLink: '참고 링크1',
     platformName: '플랫폼1',
     reviewDeadline: new Date(),
+    reservationDate: new Date(),
     serviceDetails: '참고 사항1',
     location: '주소1',
     serviceAmount: 100,
@@ -170,22 +196,26 @@ test('캠페인을 수정할 수 있다. ', async () => {
     .post(GRAPHQL_ENDPOINT)
     .send({
       query: /* GraphQL */ `
-       mutation {
-        editCampaign(input: { 
-              campaignId : ${campaign.id},
-              title: "${EDIT.title}" 
-              platformName: "${EDIT.platformName}" 
-              reviewDeadline: "${EDIT.reviewDeadline}" 
-              serviceDetails: "${EDIT.serviceDetails}" 
-              location: "${EDIT.location}" 
+        mutation {
+          editCampaign(
+            input: {
+              campaignId: ${campaign.id}
               detailedViewLink: "${EDIT.detailedViewLink}"
-              serviceAmount: "${EDIT.serviceAmount}"
-              extraAmount: "${EDIT.extraAmount}"
-               }) {
-          ok
-          error
+              extraAmount: ${EDIT.extraAmount}
+              location: "${EDIT.location}"
+              platformName: "${EDIT.platformName}"
+              reservationDate: "${EDIT.reservationDate}"
+              reviewDeadline: "${EDIT.reviewDeadline}"
+              serviceAmount: ${EDIT.serviceAmount}
+              serviceDetails: "${EDIT.serviceDetails}"
+              title: "${EDIT.title}"
+            }
+          ) {
+            ok
+            error
+          }
         }
-      }`,
+      `,
     })
     .expect(200)
     .expect((res) => {
@@ -207,7 +237,12 @@ test('캠페인을 수정할 수 있다. ', async () => {
   expect(editedCampaign.detailedViewLink).toBe(EDIT.detailedViewLink);
   expect(editedCampaign.location).toBe(EDIT.location);
   expect(editedCampaign.platformName).toBe(EDIT.platformName);
-  expect(editedCampaign.reviewDeadline).toBe(EDIT.reviewDeadline);
+  expect(editedCampaign.reviewDeadline.getTime()).toStrictEqual(
+    EDIT.reviewDeadline.setMilliseconds(0),
+  );
+  expect(editedCampaign.reservationDate.getTime()).toStrictEqual(
+    EDIT.reservationDate.setMilliseconds(0),
+  );
   expect(editedCampaign.serviceDetails).toBe(EDIT.serviceDetails);
   expect(editedCampaign.serviceAmount).toBe(EDIT.serviceAmount);
   expect(editedCampaign.extraAmount).toBe(EDIT.extraAmount);

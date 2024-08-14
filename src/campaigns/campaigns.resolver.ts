@@ -12,6 +12,10 @@ import {
   DeleteCampaignInput,
   DeleteCampaignOutput,
 } from './dtos/delete-campaign.dto';
+import {
+  EditCampaignInput,
+  EditCampaignOutput,
+} from './dtos/edit-campaign.dto';
 
 @Resolver()
 export class CampaignsResolver {
@@ -32,10 +36,10 @@ export class CampaignsResolver {
     return this.campaignService.deleteCampaign(input);
   }
 
-  // @Mutation(() => EditSagaOutput)
-  // editSaga(@Args('input') editSagaInput: EditSagaInput) {
-  //   return this.sagaService.editSaga(editSagaInput);
-  // }
+  @Mutation(() => EditCampaignOutput)
+  editCampaign(@Args('input') input: EditCampaignInput) {
+    return this.campaignService.editCampaign(input);
+  }
 
   // @Mutation(() => LikeSagaOutput)
   // setSagaLike(@Args('input') likeSagaInput: LikeSagaInput) {

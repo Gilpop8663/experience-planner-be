@@ -50,11 +50,14 @@ type CreateAccountOutput {
 }
 
 input CreateCampaignDirectlyInput {
-  detailedViewLink: String!
-  location: String!
-  platformName: String!
+  detailedViewLink: String
+  extraAmount: Float
+  location: String
+  platformName: String
+  reservationDate: DateTime
   reviewDeadline: DateTime!
-  serviceDetails: String!
+  serviceAmount: Float
+  serviceDetails: String
   title: String!
   userId: Float!
 }
@@ -99,6 +102,24 @@ type DeleteCampaignOutput {
   ok: Boolean!
 }
 
+input EditCampaignInput {
+  campaignId: Float!
+  detailedViewLink: String
+  extraAmount: Float
+  location: String
+  platformName: String
+  reservationDate: DateTime
+  reviewDeadline: DateTime
+  serviceAmount: Float
+  serviceDetails: String
+  title: String
+}
+
+type EditCampaignOutput {
+  error: String
+  ok: Boolean!
+}
+
 input EditProfileInput {
   nickname: String
   password: String
@@ -137,6 +158,7 @@ type Mutation {
   createCampaignFromLink(input: CreateCampaignLinkInput!): CreateCampaignLinkOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignOutput!
+  editCampaign(input: EditCampaignInput!): EditCampaignOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!

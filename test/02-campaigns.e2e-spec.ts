@@ -247,3 +247,56 @@ test('캠페인을 수정할 수 있다. ', async () => {
   expect(editedCampaign.serviceAmount).toBe(EDIT.serviceAmount);
   expect(editedCampaign.extraAmount).toBe(EDIT.extraAmount);
 });
+
+test('달력에 표시할 캠페인 리스트를 1일부터 31일까지 마감기한을 기준으로 내림차순으로 불러온다. ', async () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+        mutation {
+          getCalendarCampaignList(
+            input: { year:  ${year}, month: ${month}}
+          ) {
+            ok
+            error
+            data {
+              id
+              title
+              reviewDeadline
+            }
+          }
+        }
+      `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { getCalendarCampaignList },
+        },
+      } = res;
+
+      expect(getCalendarCampaignList.ok).toBe(true);
+      expect(getCalendarCampaignList.error).toBe(null);
+
+      expect(getCalendarCampaignList.ok).toBe(true);
+      expect(getCalendarCampaignList.error).toBe(null);
+      expect(getCalendarCampaignList.data).toBeInstanceOf(Array);
+      expect(getCalendarCampaignList.data.length).toBeGreaterThan(0);
+
+      // 날짜가 내림차순으로 정렬되어 있는지 확인
+      const campaigns = getCalendarCampaignList.data;
+      for (let i = 0; i < campaigns.length - 1; i++) {
+        const currentStartDate = new Date(campaigns[i].reviewDeadline);
+        const nextStartDate = new Date(campaigns[i + 1].reviewDeadline);
+
+        expect(currentStartDate.getTime()).toBeGreaterThanOrEqual(
+          nextStartDate.getTime(),
+        );
+      }
+    });
+});

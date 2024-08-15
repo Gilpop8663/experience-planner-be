@@ -51,7 +51,6 @@ export class CampaignsResolver {
 
   @Query(() => GetCalendarCampaignListOutput)
   getCalendarCampaignList(@Args('input') input: GetCalendarCampaignListInput) {
-    console.log(input);
     return this.campaignService.getCalendarCampaignList(input);
   }
 }

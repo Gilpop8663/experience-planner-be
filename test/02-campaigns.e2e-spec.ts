@@ -296,4 +296,99 @@ test('달력에 표시할 캠페인 리스트를 1일부터 31일까지 마감�
         );
       }
     });
+
+  test('마감기한이 지나지 않은 캠페인들을 마감기한 남은 순서대로 내림차순으로 불러온다. ', async () => {
+    const fixedDate = new Date('2024-08-15T00:00:00Z');
+    jest.spyOn(global, 'Date').mockImplementation(() => fixedDate);
+
+    await request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query: /* GraphQL */ `
+          query {
+            getCampaignListSortedByDeadline {
+              ok
+              error
+              data {
+                id
+                title
+                reviewDeadline
+              }
+            }
+          }
+        `,
+      })
+      .expect(200)
+      .expect((res) => {
+        const {
+          body: {
+            data: { getCampaignListSortedByDeadline },
+          },
+        } = res;
+
+        expect(getCampaignListSortedByDeadline.ok).toBe(true);
+        expect(getCampaignListSortedByDeadline.error).toBe(null);
+        expect(getCampaignListSortedByDeadline.data).toBeInstanceOf(Array);
+        expect(getCampaignListSortedByDeadline.data.length).toBeGreaterThan(0);
+
+        // 날짜가 오름차순으로 정렬되어 있는지 확인
+        const campaigns = getCampaignListSortedByDeadline.data;
+        for (let i = 0; i < campaigns.length - 1; i++) {
+          const currentStartDate = new Date(campaigns[i].reviewDeadline);
+          const nextStartDate = new Date(campaigns[i + 1].reviewDeadline);
+
+          expect(currentStartDate.getTime()).toBeLessThanOrEqual(
+            nextStartDate.getTime(),
+          );
+        }
+      });
+  });
+
+  test('마감기한이 지난 캠페인들을 마감기한이 최근 종료된 순서대로 불러온다. ', async () => {
+    await request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query: /* GraphQL */ `
+          query {
+            getExpiredCampaignListSortedByDeadline {
+              ok
+              error
+              data {
+                id
+                title
+                reviewDeadline
+              }
+            }
+          }
+        `,
+      })
+      .expect(200)
+      .expect((res) => {
+        const {
+          body: {
+            data: { getExpiredCampaignListSortedByDeadline },
+          },
+        } = res;
+
+        expect(getExpiredCampaignListSortedByDeadline.ok).toBe(true);
+        expect(getExpiredCampaignListSortedByDeadline.error).toBe(null);
+        expect(getExpiredCampaignListSortedByDeadline.data).toBeInstanceOf(
+          Array,
+        );
+        expect(
+          getExpiredCampaignListSortedByDeadline.data.length,
+        ).toBeGreaterThan(0);
+
+        // 날짜가 내림차순으로 정렬되어 있는지 확인
+        const campaigns = getExpiredCampaignListSortedByDeadline.data;
+        for (let i = 0; i < campaigns.length - 1; i++) {
+          const currentStartDate = new Date(campaigns[i].reviewDeadline);
+          const nextStartDate = new Date(campaigns[i + 1].reviewDeadline);
+
+          expect(currentStartDate.getTime()).toBeGreaterThanOrEqual(
+            nextStartDate.getTime(),
+          );
+        }
+      });
+  });
 });

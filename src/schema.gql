@@ -150,6 +150,12 @@ type GetCalendarCampaignListOutput {
   ok: Boolean!
 }
 
+type GetExpiredCampaignListSortedByDeadlineOutput {
+  data: [Campaign!]
+  error: String
+  ok: Boolean!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -180,6 +186,8 @@ type Mutation {
 type Query {
   editProfile(input: EditProfileInput!): EditProfileOutput!
   getCalendarCampaignList(input: GetCalendarCampaignListInput!): GetCalendarCampaignListOutput!
+  getCampaignListSortedByDeadline: GetCalendarCampaignListOutput!
+  getExpiredCampaignListSortedByDeadline: GetExpiredCampaignListSortedByDeadlineOutput!
   getUserProfile(input: UserProfileInput!): UserProfileOutput!
   me: User!
 }

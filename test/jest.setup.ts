@@ -23,6 +23,8 @@ const mockMailService = {
   sendResetPasswordEmail: jest.fn().mockReturnValue(true),
 };
 
+beforeEach(() => jest.useRealTimers());
+
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
@@ -50,8 +52,9 @@ beforeAll(async () => {
   console.error = (...args) => {
     const errorMessage = args[0] || '';
     if (
-      errorMessage.includes('포인트가 부족합니다.') ||
-      errorMessage.includes('유효 기간이 남아 구매할 수 없습니다.')
+      typeof errorMessage === 'string' &&
+      (errorMessage.includes('포인트가 부족합니다.') ||
+        errorMessage.includes('유효 기간이 남아 구매할 수 없습니다.'))
     ) {
       return;
     }

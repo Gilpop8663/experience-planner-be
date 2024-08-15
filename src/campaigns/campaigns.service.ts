@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Between, Repository } from 'typeorm';
+import { Between, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getKoreanTime, logErrorAndReturnFalse } from 'src/utils';
@@ -28,6 +28,8 @@ import {
   GetCalendarCampaignListInput,
   GetCalendarCampaignListOutput,
 } from './dtos/get-calendar-campaign-list.dto';
+import { GetCampaignListSortedByDeadlineOutput } from './dtos/get-campaign-list-sorted-by-deadline.dto';
+import { GetExpiredCampaignListSortedByDeadlineOutput } from './dtos/get-expired-campaign-list-sorted-by-deadline.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -382,6 +384,42 @@ export class CampaignsService {
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: Between(startDate, endDate) },
         order: { reviewDeadline: 'ASC' },
+      });
+
+      return { ok: true, data: campaign };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 리스트를 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async getCampaignListSortedByDeadline(): Promise<GetCampaignListSortedByDeadlineOutput> {
+    try {
+      const currentDate = getKoreanTime();
+
+      const campaign = await this.campaignRepository.find({
+        where: { reviewDeadline: MoreThan(currentDate) },
+        order: { reviewDeadline: 'ASC' },
+      });
+
+      return { ok: true, data: campaign };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 리스트를 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async getExpiredCampaignListSortedByDeadline(): Promise<GetExpiredCampaignListSortedByDeadlineOutput> {
+    try {
+      const currentDate = getKoreanTime();
+
+      const campaign = await this.campaignRepository.find({
+        where: { reviewDeadline: LessThan(currentDate) },
+        order: { reviewDeadline: 'DESC' },
       });
 
       return { ok: true, data: campaign };

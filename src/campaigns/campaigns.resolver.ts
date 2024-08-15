@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { CampaignsService } from './campaigns.service';
 import {
   CreateCampaignLinkInput,
@@ -16,7 +16,10 @@ import {
   EditCampaignInput,
   EditCampaignOutput,
 } from './dtos/edit-campaign.dto';
-
+import {
+  GetCalendarCampaignListInput,
+  GetCalendarCampaignListOutput,
+} from './dtos/get-calendar-campaign-list.dto';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -41,23 +44,14 @@ export class CampaignsResolver {
     return this.campaignService.editCampaign(input);
   }
 
-  // @Mutation(() => LikeSagaOutput)
-  // setSagaLike(@Args('input') likeSagaInput: LikeSagaInput) {
-  //   return this.likeService.likeSaga(likeSagaInput);
-  // }
-
-  // @Mutation(() => InterestSagaOutput)
-  // setSagaInterest(@Args('input') interestSagaInput: InterestSagaInput) {
-  //   return this.interestService.interestSaga(interestSagaInput);
-  // }
-
   // @Mutation(() => CompleteSagaOutput)
   // completeSaga(@Args('input') input: CompleteSagaInput) {
   //   return this.sagaService.completeSaga(input);
   // }
 
-  // @Query(() => [Saga])
-  // getSagaList() {
-  //   return this.sagaService.getSagaList();
-  // }
+  @Query(() => GetCalendarCampaignListOutput)
+  getCalendarCampaignList(@Args('input') input: GetCalendarCampaignListInput) {
+    console.log(input);
+    return this.campaignService.getCalendarCampaignList(input);
+  }
 }

@@ -16,3 +16,9 @@ export const logErrorAndReturnFalse = (
     console.error(error);
   }
 };
+
+export const getKoreanTime = (date: Date = new Date()): Date => {
+  const kstOffset = 9 * 60 * 60 * 1000; // KST는 UTC+9시간
+
+  return new Date(date.getTime() + kstOffset);
+};

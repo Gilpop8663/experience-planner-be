@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { logErrorAndReturnFalse } from 'src/utils';
+import { getKoreanTime, logErrorAndReturnFalse } from 'src/utils';
 import { Campaign } from './entities/campaign.entity';
 import {
   CreateCampaignLinkInput,
@@ -24,6 +24,10 @@ import {
   EditCampaignInput,
   EditCampaignOutput,
 } from './dtos/edit-campaign.dto';
+import {
+  GetCalendarCampaignListInput,
+  GetCalendarCampaignListOutput,
+} from './dtos/get-calendar-campaign-list.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -306,7 +310,7 @@ export class CampaignsService {
       endDate.setFullYear(currentYear + 1);
     }
 
-    const koreanEndDate = new Date(endDate.getTime() + 9 * 60 * 60 * 1000); // 9시간 추가
+    const koreanEndDate = getKoreanTime(endDate);
 
     return koreanEndDate;
   }
@@ -367,9 +371,25 @@ export class CampaignsService {
   //   }
   // }
 
-  // async getSagaList() {
-  //   return this.sagaRepository.find({
-  //     relations: ['author', 'likes', 'interests'],
-  //   });
-  // }
+  async getCalendarCampaignList({
+    year,
+    month,
+  }: GetCalendarCampaignListInput): Promise<GetCalendarCampaignListOutput> {
+    try {
+      const startDate = getKoreanTime(new Date(year, month - 1, 1, 0, 0, 0));
+      const endDate = getKoreanTime(new Date(year, month, 0, 23, 59, 59)); // 해당 월의 마지막 날 23:59:59
+
+      const campaign = await this.campaignRepository.find({
+        where: { reviewDeadline: Between(startDate, endDate) },
+        order: { reviewDeadline: 'ASC' },
+      });
+
+      return { ok: true, data: campaign };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 리스트를 불러오는 데 실패했습니다.',
+      );
+    }
+  }
 }

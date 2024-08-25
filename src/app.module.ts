@@ -76,7 +76,7 @@ const getEnvFilePath = () => {
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      context: ({ req }) => ({ user: req['user'] }),
+      context: ({ req, res }) => ({ user: req['user'], req, res }),
       introspection: true,
       playground: true,
     }),

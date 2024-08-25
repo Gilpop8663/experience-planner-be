@@ -7,11 +7,13 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { PasswordResetToken } from 'src/users/entities/passwordResetToken.entity';
 import { MailService } from 'src/mail/mail.service';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
+import { Verification } from 'src/users/entities/verification.entity';
 
 let app: INestApplication;
 let dataSource: DataSource;
 let usersRepository: Repository<User>;
 let campaignRepository: Repository<Campaign>;
+let verificationRepository: Repository<Verification>;
 let mailService: MailService;
 let passwordResetTokenRepository: Repository<PasswordResetToken>;
 
@@ -44,6 +46,9 @@ beforeAll(async () => {
     Repository<PasswordResetToken>
   >(getRepositoryToken(PasswordResetToken));
 
+  verificationRepository = moduleFixture.get<Repository<Verification>>(
+    getRepositoryToken(Verification),
+  );
   mailService = moduleFixture.get<MailService>(MailService);
 
   dataSource = moduleFixture.get<DataSource>(DataSource);
@@ -75,5 +80,6 @@ export {
   usersRepository,
   campaignRepository,
   mailService,
+  verificationRepository,
   passwordResetTokenRepository,
 };

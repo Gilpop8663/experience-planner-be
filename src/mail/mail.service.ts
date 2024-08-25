@@ -50,23 +50,12 @@ export class MailService {
     }
   }
 
-  sendVerificationEmail({
-    email,
-    nickname,
-    code,
-  }: {
-    email: string;
-    nickname: string;
-    code: string;
-  }) {
+  sendVerificationEmail({ email, code }: { email: string; code: string }) {
     this.sendEmail({
       to: email,
       template: 'verify-email',
-      subject: '[당신의 불행을 삽니다] 이메일 인증이 도착했습니다.',
-      emailVars: [
-        { key: 'code', value: code },
-        { key: 'nickname', value: nickname },
-      ],
+      subject: '[체험단 플래너] 이메일 인증이 도착했습니다.',
+      emailVars: [{ key: 'code', value: code }],
     });
   }
 
@@ -82,7 +71,7 @@ export class MailService {
     this.sendEmail({
       to: email,
       template: 'reset-password',
-      subject: '[당신의 불행을 삽니다] 비밀번호 재설정 링크가 도착했습니다.',
+      subject: '[체험단 플래너] 비밀번호 재설정 링크가 도착했습니다.',
       emailVars: [
         { key: 'code', value: code },
         { key: 'nickname', value: nickname },

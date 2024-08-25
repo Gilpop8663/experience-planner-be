@@ -178,8 +178,9 @@ type Mutation {
   editCampaign(input: EditCampaignInput!): EditCampaignOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
+  refreshToken: LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
-  sendVerifyEmail: SendVerifyEmailOutput!
+  sendVerifyEmail(input: SendVerifyEmailInput!): SendVerifyEmailOutput!
   verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
 }
 
@@ -202,6 +203,10 @@ type ResetPasswordOutput {
   ok: Boolean!
 }
 
+input SendVerifyEmailInput {
+  email: String!
+}
+
 type SendVerifyEmailOutput {
   error: String
   ok: Boolean!
@@ -216,7 +221,6 @@ type User {
   password: String!
   point: Float!
   updatedAt: DateTime!
-  verified: Boolean!
 }
 
 input UserProfileInput {
@@ -231,6 +235,7 @@ type UserProfileOutput {
 
 input VerifyEmailInput {
   code: String!
+  email: String!
 }
 
 type VerifyEmailOutput {

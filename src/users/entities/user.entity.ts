@@ -10,7 +10,7 @@ import {
   Unique,
 } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
-import { IsBoolean, IsEmail, IsNumber, Length } from 'class-validator';
+import { IsEmail, IsNumber, Length } from 'class-validator';
 import { PasswordResetToken } from './passwordResetToken.entity';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 
@@ -38,11 +38,6 @@ export class User extends CoreEntity {
   @Field(() => String)
   @Length(2, 20)
   nickname: string;
-
-  @Column({ default: false })
-  @Field(() => Boolean)
-  @IsBoolean()
-  verified: boolean;
 
   @Field(() => [Campaign])
   @OneToMany(() => Campaign, (campaign) => campaign.user)

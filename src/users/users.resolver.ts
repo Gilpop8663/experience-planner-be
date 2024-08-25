@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import {
   CreateAccountInput,
@@ -12,7 +12,10 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
-import { SendVerifyEmailOutput } from './dtos/send-verify-email.dto';
+import {
+  SendVerifyEmailInput,
+  SendVerifyEmailOutput,
+} from './dtos/send-verify-email.dto';
 import {
   CheckNicknameInput,
   CheckNicknameOutput,
@@ -30,6 +33,7 @@ import {
   ResetPasswordInput,
   ResetPasswordOutput,
 } from './dtos/reset-password.dto';
+import { Request, Response } from 'express';
 
 @Resolver()
 export class UsersResolver {
@@ -41,8 +45,8 @@ export class UsersResolver {
   }
 
   @Mutation(() => LoginOutput)
-  login(@Args('input') loginInput: LoginInput) {
-    return this.usersService.login(loginInput);
+  login(@Args('input') loginInput: LoginInput, @Context('res') res: Response) {
+    return this.usersService.login(loginInput, res);
   }
 
   @Query(() => User)
@@ -66,15 +70,14 @@ export class UsersResolver {
     return this.usersService.editProfile(user.id, editProfileInput);
   }
 
-  @UseGuards(AuthGuard)
   @Mutation(() => SendVerifyEmailOutput)
-  sendVerifyEmail(@AuthUser() user: User) {
-    return this.usersService.sendVerifyEmail({ userId: user.id });
+  sendVerifyEmail(@Args('input') { email }: SendVerifyEmailInput) {
+    return this.usersService.sendVerifyEmail({ email });
   }
 
   @Mutation(() => VerifyEmailOutput)
-  verifyEmail(@Args('input') { code }: VerifyEmailInput) {
-    return this.usersService.verifyEmail(code);
+  verifyEmail(@Args('input') input: VerifyEmailInput) {
+    return this.usersService.verifyEmail(input);
   }
 
   @Mutation(() => CheckNicknameOutput)
@@ -100,5 +103,10 @@ export class UsersResolver {
   @Mutation(() => ResetPasswordOutput)
   resetPassword(@Args('input') input: ResetPasswordInput) {
     return this.usersService.resetPassword(input);
+  }
+
+  @Mutation(() => LoginOutput)
+  refreshToken(@Context() req: Request) {
+    return this.usersService.refreshToken(req);
   }
 }

@@ -273,13 +273,28 @@ export class CampaignsService {
 
     await browser.close();
 
-    const title = $('h2').text().trim();
-    const thumbnailUrl = $('.campaign-title-img').attr('src');
+    const title = $('h2.ng-binding').text().trim();
+    const thumbnailUrl = '';
     const reviewDeadline = this.getDeadlineDate(
-      $('.con.ng-binding').eq(2).text(),
+      $('div.title:contains("콘텐츠 등록기간")', 'div.mobile-aside')
+        .next()
+        .text(),
     );
-    const serviceDetails = $('.ng-binding', '#scrollspy-reward').text().trim();
-    const location = $('.desc.address.ng-binding').text().trim();
+    const serviceDetails = $('p', 'campaign-new-head-info').text().trim();
+    // const isDelivery = $('dt:contains("링크")').next().text();
+
+    const location = $('button:contains("주소 복사")').prev().text().trim();
+
+    console.log(
+      title,
+      thumbnailUrl,
+      reviewDeadline,
+      $('div.title:contains("콘텐츠 등록기간")', 'div.mobile-aside')
+        .next()
+        .text(),
+      serviceDetails,
+      location,
+    );
 
     const campaign = this.campaignRepository.create({
       user,
@@ -287,7 +302,7 @@ export class CampaignsService {
       detailedViewLink: linkUrl,
       platformName: PLATFORM_NAME.레뷰,
       thumbnailUrl,
-      reviewDeadline,
+      reviewDeadline: this.getDeadlineDate('08.29~08.31'),
       serviceDetails,
       location,
     });
@@ -359,19 +374,6 @@ export class CampaignsService {
       return { ok: false, error: '시리즈 수정에 실패했습니다.' };
     }
   }
-
-  // async completeSaga({
-  //   sagaId,
-  //   isCompleted,
-  // }: CompleteSagaInput): Promise<CompleteSagaOutput> {
-  //   try {
-  //     await this.sagaRepository.update(sagaId, { isCompleted });
-
-  //     return { ok: true };
-  //   } catch (error) {
-  //     return logErrorAndReturnFalse(error, '시리즈 완결 작업에 실패했습니다');
-  //   }
-  // }
 
   async getCalendarCampaignList({
     year,

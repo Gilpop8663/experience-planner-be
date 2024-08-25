@@ -3,8 +3,8 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
 export class SendVerifyEmailInput {
-  @Field(() => Number)
-  userId: number;
+  @Field(() => String)
+  email: string;
 }
 
 @ObjectType()

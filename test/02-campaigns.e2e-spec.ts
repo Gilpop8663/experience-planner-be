@@ -16,6 +16,21 @@ test.each([
 ])(
   '%s 링크를 입력해서 %s 캠페인을 생성한다.',
   async (platformName, deliveryType, detailedViewLink) => {
+    const fixedDate = new Date('2024-08-15T00:00:00Z');
+    jest
+      .useFakeTimers({
+        doNotFake: [
+          'nextTick',
+          'setImmediate',
+          'clearImmediate',
+          'setInterval',
+          'clearInterval',
+          'setTimeout',
+          'clearTimeout',
+        ],
+      })
+      .setSystemTime(fixedDate);
+
     const [initialUser] = await usersRepository.find();
 
     await request(app.getHttpServer())

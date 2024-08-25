@@ -4,6 +4,7 @@ import {
   mailService,
   passwordResetTokenRepository,
   usersRepository,
+  verificationRepository,
 } from './jest.setup';
 
 const GRAPHQL_ENDPOINT = '/graphql';
@@ -16,7 +17,11 @@ const TEST_USER = {
 
 describe('AppController (e2e)', () => {
   beforeAll(async () => {
-    const createUser = ({ email, nickname, password }) => {
+    const createUser = async ({ email, nickname, password }) => {
+      await verificationRepository.save(
+        verificationRepository.create({ email, verified: true }),
+      );
+
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
         .send({
@@ -48,7 +53,14 @@ describe('AppController (e2e)', () => {
   });
 
   describe('아이디 생성', () => {
-    test('아이디를 생성한다.', () => {
+    test('아이디를 생성한다.', async () => {
+      await verificationRepository.save(
+        verificationRepository.create({
+          email: TEST_USER.email,
+          verified: true,
+        }),
+      );
+
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
         .send({

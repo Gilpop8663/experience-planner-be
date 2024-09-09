@@ -79,6 +79,13 @@ const getEnvFilePath = () => {
       context: ({ req, res }) => ({ user: req['user'], req, res }),
       introspection: true,
       playground: true,
+      formatError: (error) => {
+        console.log(error);
+        return {
+          message: error.message,
+          code: error.extensions.code,
+        };
+      },
     }),
     UsersModule,
     CommonModule,

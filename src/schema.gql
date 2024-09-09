@@ -176,6 +176,7 @@ type Mutation {
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignOutput!
   editCampaign(input: EditCampaignInput!): EditCampaignOutput!
+  editProfile(input: EditProfileInput!): EditProfileOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
   refreshToken: LoginOutput!
@@ -185,7 +186,6 @@ type Mutation {
 }
 
 type Query {
-  editProfile(input: EditProfileInput!): EditProfileOutput!
   getCalendarCampaignList(input: GetCalendarCampaignListInput!): GetCalendarCampaignListOutput!
   getCampaignListSortedByDeadline: GetCalendarCampaignListOutput!
   getExpiredCampaignListSortedByDeadline: GetExpiredCampaignListSortedByDeadlineOutput!

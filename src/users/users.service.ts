@@ -1,4 +1,4 @@
-import { Injectable, Req, Res } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -33,7 +33,7 @@ import {
   ResetPasswordInput,
   ResetPasswordOutput,
 } from './dtos/reset-password.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -94,7 +94,7 @@ export class UsersService {
         where: {
           email,
         },
-        select: ['password'],
+        select: ['password', 'id'],
       });
 
       if (!user) {
@@ -129,7 +129,8 @@ export class UsersService {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true, // 클라이언트 JavaScript로 접근 불가
         secure: process.env.NODE_ENV === 'production', // HTTPS에서만 전송 (프로덕션에서 사용)
-        sameSite: 'strict', // 크로스 사이트 요청 제한
+        // sameSite: 'strict', // 크로스 사이트 요청 제한
+        sameSite: 'lax', // 크로스 사이트 요청 제한
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7일간 유효
       });
 
@@ -142,21 +143,13 @@ export class UsersService {
     }
   }
 
-  async refreshToken(@Req() req: Request) {
-    const refreshToken = req.cookies['refreshToken'];
-
-    if (!refreshToken) {
-      return { ok: false, error: '리프레시 토큰이 없습니다.' };
-    }
-
+  async refreshToken(refreshToken: string) {
     try {
       const decoded = this.jwtService.verify(refreshToken);
       const result = await this.getUserProfile(decoded['id']);
-
       if (!result.user) {
         return { ok: false, error: '사용자를 찾을 수 없습니다.' };
       }
-
       const newAccessToken = this.jwtService.sign(
         { id: result.user.id },
         { expiresIn: '1h' },
@@ -261,7 +254,6 @@ export class UsersService {
       const verification = await this.verifications.findOne({
         where: { email },
       });
-      console.log(verification);
 
       if (verification.code === code) {
         await this.verifications.update(verification.id, { verified: true });

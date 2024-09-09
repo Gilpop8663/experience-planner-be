@@ -1,12 +1,12 @@
-import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-export const AuthUser = createParamDecorator(
+export const Cookies = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const gqlContext = GqlExecutionContext.create(context).getContext();
 
-    const user = gqlContext['user'];
+    const cookies = gqlContext['req'].cookies;
 
-    return user;
+    return cookies;
   },
 );

@@ -1,7 +1,9 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { JwtService } from './jwt.service';
 import { UsersService } from 'src/users/users.service';
+import { TokenExpiredError } from 'jsonwebtoken';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class JwtMiddleware implements NestMiddleware {
@@ -10,8 +12,27 @@ export class JwtMiddleware implements NestMiddleware {
     private readonly userService: UsersService,
   ) {}
 
-  use(req: Request, res: Response, next: NextFunction) {
+  async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers['authorization'];
+
+    const excludedAuthQueries = [
+      'login',
+      'checkEmail',
+      'checkNickname',
+      'verifyEmail',
+      'sendVerifyEmail',
+      'forgotPassword',
+      'createAccount',
+    ];
+
+    const isExcludedAuthQuery = excludedAuthQueries.some((path) =>
+      req.body.query.includes(path),
+    );
+
+    if (isExcludedAuthQuery) {
+      next();
+      return;
+    }
 
     if (authHeader && typeof authHeader === 'string') {
       // Authorization: Bearer <token>
@@ -20,14 +41,31 @@ export class JwtMiddleware implements NestMiddleware {
       try {
         const decoded = this.jwtService.verify(token);
 
-        console.log(decoded);
+        if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
+          const result = await this.userService.getUserProfile(decoded['id']);
 
-        if (typeof decoded !== 'object' || !decoded.hasOwnProperty('id')) {
-          const user = this.userService.getUserProfile(decoded['id']);
-          req['user'] = user;
+          if (!result.ok) {
+            next();
+            return;
+          }
+
+          req['user'] = result.user;
         }
       } catch (error) {
-        // 토큰 검증 실패 시 처리 (예: 로그 출력 등)
+        if (error instanceof TokenExpiredError) {
+          const graphQLError = new GraphQLError('토큰이 만료되었습니다.', {
+            extensions: { code: 'UNAUTHENTICATED' },
+          });
+
+          if (req.body.query.includes('RefreshToken')) {
+            next();
+            return;
+          }
+
+          // GraphQL 에러를 직접 응답으로 보냄
+          return res.status(401).json({ errors: [graphQLError] });
+        }
+
         console.error('Token verification failed:', error);
       }
     }

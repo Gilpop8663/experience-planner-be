@@ -33,7 +33,8 @@ import {
   ResetPasswordInput,
   ResetPasswordOutput,
 } from './dtos/reset-password.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { Cookies } from 'src/auth/cookie.decorator';
 
 @Resolver()
 export class UsersResolver {
@@ -61,7 +62,7 @@ export class UsersResolver {
     return this.usersService.getUserProfile(userProfileInput);
   }
 
-  @Query(() => EditProfileOutput)
+  @Mutation(() => EditProfileOutput)
   @UseGuards(AuthGuard)
   editProfile(
     @AuthUser() user: User,
@@ -106,7 +107,14 @@ export class UsersResolver {
   }
 
   @Mutation(() => LoginOutput)
-  refreshToken(@Context() req: Request) {
-    return this.usersService.refreshToken(req);
+  refreshToken(@Cookies() cookies: Record<string, string>) {
+    // console.log(req);
+    const refreshToken = cookies.refreshToken;
+
+    if (!refreshToken) {
+      return { ok: false, error: '리프레시 토큰이 없습니다.' };
+    }
+
+    return this.usersService.refreshToken(refreshToken);
   }
 }

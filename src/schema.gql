@@ -10,7 +10,7 @@ type Campaign {
   isReserved: Boolean!
   location: String!
   platformName: String!
-  reservationDate: DateTime!
+  reservationDate: DateTime
   reviewDeadline: DateTime!
   serviceAmount: Float!
   serviceDetails: String!
@@ -34,6 +34,11 @@ input CheckNicknameInput {
 }
 
 type CheckNicknameOutput {
+  error: String
+  ok: Boolean!
+}
+
+type CoreOutput {
   error: String
   ok: Boolean!
 }
@@ -68,12 +73,12 @@ type CreateCampaignDirectlyOutput {
   ok: Boolean!
 }
 
-input CreateCampaignLinkInput {
+input CreateCampaignFromLinkInput {
   detailedViewLink: String!
   userId: Float!
 }
 
-type CreateCampaignLinkOutput {
+type CreateCampaignFromLinkOutput {
   campaignId: Float
   error: String
   ok: Boolean!
@@ -172,13 +177,14 @@ type Mutation {
   checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
   createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
-  createCampaignFromLink(input: CreateCampaignLinkInput!): CreateCampaignLinkOutput!
+  createCampaignFromLink(input: CreateCampaignFromLinkInput!): CreateCampaignFromLinkOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignOutput!
   editCampaign(input: EditCampaignInput!): EditCampaignOutput!
   editProfile(input: EditProfileInput!): EditProfileOutput!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordOutput!
   login(input: LoginInput!): LoginOutput!
+  logout: CoreOutput!
   refreshToken: LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
   sendVerifyEmail(input: SendVerifyEmailInput!): SendVerifyEmailOutput!

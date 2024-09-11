@@ -4,10 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getKoreanTime, logErrorAndReturnFalse } from 'src/utils';
 import { Campaign } from './entities/campaign.entity';
-import {
-  CreateCampaignLinkInput,
-  CreateCampaignLinkOutput,
-} from './dtos/create-campaign-link.dto';
+
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
@@ -30,6 +27,10 @@ import {
 } from './dtos/get-calendar-campaign-list.dto';
 import { GetCampaignListSortedByDeadlineOutput } from './dtos/get-campaign-list-sorted-by-deadline.dto';
 import { GetExpiredCampaignListSortedByDeadlineOutput } from './dtos/get-expired-campaign-list-sorted-by-deadline.dto';
+import {
+  CreateCampaignFromLinkInput,
+  CreateCampaignFromLinkOutput,
+} from './dtos/create-campaign-link.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -80,7 +81,7 @@ export class CampaignsService {
   async createCampaignFromLink({
     detailedViewLink,
     userId,
-  }: CreateCampaignLinkInput): Promise<CreateCampaignLinkOutput> {
+  }: CreateCampaignFromLinkInput): Promise<CreateCampaignFromLinkOutput> {
     try {
       const platformName = this.getPlatformName(detailedViewLink);
 
@@ -366,7 +367,10 @@ export class CampaignsService {
         serviceAmount,
         reviewDeadline,
         detailedViewLink,
-        reservationDate,
+        reservationDate:
+          new Date(reservationDate).toISOString() === '1970-01-01T00:00:00.000Z'
+            ? null
+            : reservationDate,
       });
 
       return { ok: true };
@@ -388,7 +392,12 @@ export class CampaignsService {
         order: { reviewDeadline: 'ASC' },
       });
 
-      return { ok: true, data: campaign };
+      const formattedCampaigns = campaign.map((item) => ({
+        ...item,
+        isReserved: item.reservationDate ? true : false,
+      }));
+
+      return { ok: true, data: formattedCampaigns };
     } catch (error) {
       return logErrorAndReturnFalse(
         error,
@@ -406,7 +415,12 @@ export class CampaignsService {
         order: { reviewDeadline: 'ASC' },
       });
 
-      return { ok: true, data: campaign };
+      const formattedCampaigns = campaign.map((item) => ({
+        ...item,
+        isReserved: item.reservationDate ? true : false,
+      }));
+
+      return { ok: true, data: formattedCampaigns };
     } catch (error) {
       return logErrorAndReturnFalse(
         error,
@@ -424,7 +438,12 @@ export class CampaignsService {
         order: { reviewDeadline: 'DESC' },
       });
 
-      return { ok: true, data: campaign };
+      const formattedCampaigns = campaign.map((item) => ({
+        ...item,
+        isReserved: item.reservationDate ? true : false,
+      }));
+
+      return { ok: true, data: formattedCampaigns };
     } catch (error) {
       return logErrorAndReturnFalse(
         error,

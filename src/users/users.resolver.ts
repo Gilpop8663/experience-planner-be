@@ -35,6 +35,7 @@ import {
 } from './dtos/reset-password.dto';
 import { Response } from 'express';
 import { Cookies } from 'src/auth/cookie.decorator';
+import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @Resolver()
 export class UsersResolver {
@@ -107,7 +108,10 @@ export class UsersResolver {
   }
 
   @Mutation(() => LoginOutput)
-  refreshToken(@Cookies() cookies: Record<string, string>) {
+  refreshToken(
+    @Cookies() cookies: Record<string, string>,
+    @Context('res') res: Response,
+  ) {
     // console.log(req);
     const refreshToken = cookies.refreshToken;
 
@@ -115,6 +119,11 @@ export class UsersResolver {
       return { ok: false, error: '리프레시 토큰이 없습니다.' };
     }
 
-    return this.usersService.refreshToken(refreshToken);
+    return this.usersService.refreshToken(refreshToken, res);
+  }
+
+  @Mutation(() => CoreOutput)
+  logout(@Context('res') res: Response) {
+    return this.usersService.logout(res);
   }
 }

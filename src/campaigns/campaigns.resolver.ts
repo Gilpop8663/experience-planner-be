@@ -1,8 +1,8 @@
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { CampaignsService } from './campaigns.service';
 import {
-  CreateCampaignLinkInput,
-  CreateCampaignLinkOutput,
+  CreateCampaignFromLinkInput,
+  CreateCampaignFromLinkOutput,
 } from './dtos/create-campaign-link.dto';
 import {
   CreateCampaignDirectlyInput,
@@ -25,8 +25,8 @@ import { GetExpiredCampaignListSortedByDeadlineOutput } from './dtos/get-expired
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
 
-  @Mutation(() => CreateCampaignLinkOutput)
-  createCampaignFromLink(@Args('input') input: CreateCampaignLinkInput) {
+  @Mutation(() => CreateCampaignFromLinkOutput)
+  createCampaignFromLink(@Args('input') input: CreateCampaignFromLinkInput) {
     return this.campaignService.createCampaignFromLink(input);
   }
 
@@ -44,11 +44,6 @@ export class CampaignsResolver {
   editCampaign(@Args('input') input: EditCampaignInput) {
     return this.campaignService.editCampaign(input);
   }
-
-  // @Mutation(() => CompleteSagaOutput)
-  // completeSaga(@Args('input') input: CompleteSagaInput) {
-  //   return this.sagaService.completeSaga(input);
-  // }
 
   @Query(() => GetCalendarCampaignListOutput)
   getCalendarCampaignList(@Args('input') input: GetCalendarCampaignListInput) {

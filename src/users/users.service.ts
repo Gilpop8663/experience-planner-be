@@ -143,7 +143,7 @@ export class UsersService {
     }
   }
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string, @Res() res: Response) {
     try {
       const decoded = this.jwtService.verify(refreshToken);
       const result = await this.getUserProfile(decoded['id']);
@@ -155,12 +155,43 @@ export class UsersService {
         { expiresIn: '1h' },
       );
 
+      const newRefreshToken = this.jwtService.sign(
+        { id: result.user.id },
+        { expiresIn: '7d' },
+      );
+
+      res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일간 유효
+      });
+
       return {
         ok: true,
         token: newAccessToken,
       };
     } catch (error) {
       return { ok: false, error: '유효하지 않은 리프레시 토큰입니다.' };
+    }
+  }
+
+  async logout(@Res() res: Response) {
+    try {
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '로그아웃에 실패했습니다.',
+      };
     }
   }
 

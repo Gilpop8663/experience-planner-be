@@ -31,10 +31,10 @@ export class Campaign extends CoreEntity {
   isReserved: boolean;
 
   @Column({ default: null, nullable: true })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   reservationDate: Date;
 
-  @Column({ default: null, nullable: true })
+  @Column()
   @Field(() => Date)
   reviewDeadline: Date;
 

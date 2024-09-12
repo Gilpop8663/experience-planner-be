@@ -112,7 +112,6 @@ export class UsersResolver {
     @Cookies() cookies: Record<string, string>,
     @Context('res') res: Response,
   ) {
-    // console.log(req);
     const refreshToken = cookies.refreshToken;
 
     if (!refreshToken) {

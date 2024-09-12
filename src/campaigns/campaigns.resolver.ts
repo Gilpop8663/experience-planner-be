@@ -21,6 +21,10 @@ import {
   GetCalendarCampaignListOutput,
 } from './dtos/get-calendar-campaign-list.dto';
 import { GetExpiredCampaignListSortedByDeadlineOutput } from './dtos/get-expired-campaign-list-sorted-by-deadline.dto';
+import {
+  GetCampaignDetailInput,
+  GetCampaignDetailOutPut,
+} from './dtos/get-campaign-detail.dto';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -58,5 +62,10 @@ export class CampaignsResolver {
   @Query(() => GetExpiredCampaignListSortedByDeadlineOutput)
   getExpiredCampaignListSortedByDeadline() {
     return this.campaignService.getExpiredCampaignListSortedByDeadline();
+  }
+
+  @Query(() => GetCampaignDetailOutPut)
+  getCampaignDetail(@Args('input') input: GetCampaignDetailInput) {
+    return this.campaignService.getCampaignDetail(input);
   }
 }

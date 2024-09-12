@@ -263,6 +263,65 @@ test('캠페인을 수정할 수 있다. ', async () => {
   expect(editedCampaign.extraAmount).toBe(EDIT.extraAmount);
 });
 
+test('캠페인 상세 정보를 불러올 수 있다. ', async () => {
+  const [campaign] = await campaignRepository.find({ relations: ['user'] });
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+        query {
+          getCampaignDetail(
+            input: {
+              campaignId: ${campaign.id}
+            }
+          ) {
+            ok
+            error
+            data{
+              title
+              detailedViewLink
+              location
+              platformName
+              reviewDeadline
+              reservationDate
+              serviceDetails
+              serviceAmount
+              extraAmount
+            }
+          }
+        }
+      `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { getCampaignDetail },
+        },
+      } = res;
+
+      expect(getCampaignDetail.ok).toBe(true);
+      expect(getCampaignDetail.error).toBe(null);
+
+      const campaignDetail = getCampaignDetail.data;
+
+      expect(campaignDetail.title).toBe(campaign.title);
+      expect(campaignDetail.detailedViewLink).toBe(campaign.detailedViewLink);
+      expect(campaignDetail.location).toBe(campaign.location);
+      expect(campaignDetail.platformName).toBe(campaign.platformName);
+      expect(new Date(campaignDetail.reviewDeadline)).toStrictEqual(
+        new Date(campaign.reviewDeadline),
+      );
+      expect(new Date(campaignDetail.reservationDate)).toStrictEqual(
+        new Date(campaign.reservationDate),
+      );
+      expect(campaignDetail.serviceDetails).toBe(campaign.serviceDetails);
+      expect(campaignDetail.serviceAmount).toBe(campaign.serviceAmount);
+      expect(campaignDetail.extraAmount).toBe(campaign.extraAmount);
+    });
+});
+
 test('달력에 표시할 캠페인 리스트를 1일부터 31일까지 마감기한을 기준으로 내림차순으로 불러온다. ', async () => {
   const date = new Date();
   const year = date.getFullYear();

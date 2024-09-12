@@ -31,6 +31,10 @@ import {
   CreateCampaignFromLinkInput,
   CreateCampaignFromLinkOutput,
 } from './dtos/create-campaign-link.dto';
+import {
+  GetCampaignDetailInput,
+  GetCampaignDetailOutPut,
+} from './dtos/get-campaign-detail.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -286,17 +290,6 @@ export class CampaignsService {
 
     const location = $('button:contains("주소 복사")').prev().text().trim();
 
-    console.log(
-      title,
-      thumbnailUrl,
-      reviewDeadline,
-      $('div.title:contains("콘텐츠 등록기간")', 'div.mobile-aside')
-        .next()
-        .text(),
-      serviceDetails,
-      location,
-    );
-
     const campaign = this.campaignRepository.create({
       user,
       title,
@@ -448,6 +441,28 @@ export class CampaignsService {
       return logErrorAndReturnFalse(
         error,
         '캠페인 리스트를 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async getCampaignDetail({
+    campaignId,
+  }: GetCampaignDetailInput): Promise<GetCampaignDetailOutPut> {
+    try {
+      const campaign = await this.campaignRepository.findOne({
+        where: { id: campaignId },
+      });
+
+      const formattedCampaign = {
+        ...campaign,
+        isReserved: campaign.reservationDate ? true : false,
+      };
+
+      return { ok: true, data: formattedCampaign };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 상세 정보를 불러오는 데 실패했습니다.',
       );
     }
   }

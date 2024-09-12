@@ -155,6 +155,16 @@ type GetCalendarCampaignListOutput {
   ok: Boolean!
 }
 
+input GetCampaignDetailInput {
+  campaignId: Float!
+}
+
+type GetCampaignDetailOutPut {
+  data: Campaign
+  error: String
+  ok: Boolean!
+}
+
 type GetExpiredCampaignListSortedByDeadlineOutput {
   data: [Campaign!]
   error: String
@@ -193,6 +203,7 @@ type Mutation {
 
 type Query {
   getCalendarCampaignList(input: GetCalendarCampaignListInput!): GetCalendarCampaignListOutput!
+  getCampaignDetail(input: GetCampaignDetailInput!): GetCampaignDetailOutPut!
   getCampaignListSortedByDeadline: GetCalendarCampaignListOutput!
   getExpiredCampaignListSortedByDeadline: GetExpiredCampaignListSortedByDeadlineOutput!
   getUserProfile(input: UserProfileInput!): UserProfileOutput!

@@ -449,6 +449,12 @@ export class CampaignsService {
     campaignId,
   }: GetCampaignDetailInput): Promise<GetCampaignDetailOutPut> {
     try {
+      if (campaignId === 0)
+        return {
+          ok: false,
+          error: '캠페인이 존재하지 않습니다.',
+        };
+
       const campaign = await this.campaignRepository.findOne({
         where: { id: campaignId },
       });

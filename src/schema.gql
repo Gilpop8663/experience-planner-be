@@ -38,6 +38,15 @@ type CheckNicknameOutput {
   ok: Boolean!
 }
 
+input CheckPasswordInput {
+  password: String
+}
+
+type CheckPasswordOutput {
+  error: String
+  ok: Boolean!
+}
+
 type CoreOutput {
   error: String
   ok: Boolean!
@@ -185,6 +194,7 @@ type LoginOutput {
 type Mutation {
   checkEmail(input: CheckEmailInput!): CheckEmailOutput!
   checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
+  checkPassword(input: CheckPasswordInput!): CheckPasswordOutput!
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
   createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
   createCampaignFromLink(input: CreateCampaignFromLinkInput!): CreateCampaignFromLinkOutput!

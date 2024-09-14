@@ -34,6 +34,10 @@ import {
   ResetPasswordOutput,
 } from './dtos/reset-password.dto';
 import { Response } from 'express';
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/check-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -410,6 +414,28 @@ export class UsersService {
       return { ok: true };
     } catch (error) {
       return logErrorAndReturnFalse(error, '비밀번호 재설정에 실패했습니다.');
+    }
+  }
+
+  async checkPassword(
+    userId: number,
+    { password }: CheckPasswordInput,
+  ): Promise<CheckPasswordOutput> {
+    try {
+      const user = await this.users.findOne({
+        where: { id: userId },
+        select: ['password'],
+      });
+
+      const isPasswordCorrect = await user.checkPassword(password);
+
+      if (!isPasswordCorrect) {
+        return { ok: false, error: '비밀번호가 맞지 않습니다.' };
+      }
+
+      return { ok: true };
+    } catch (error) {
+      return logErrorAndReturnFalse(error, '비밀번호 확인에 실패했습니다.');
     }
   }
 }

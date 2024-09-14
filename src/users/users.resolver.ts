@@ -36,6 +36,10 @@ import {
 import { Response } from 'express';
 import { Cookies } from 'src/auth/cookie.decorator';
 import { CoreOutput } from 'src/common/dtos/output.dto';
+import {
+  CheckPasswordInput,
+  CheckPasswordOutput,
+} from './dtos/check-password.dto';
 
 @Resolver()
 export class UsersResolver {
@@ -70,6 +74,15 @@ export class UsersResolver {
     @Args('input') editProfileInput: EditProfileInput,
   ) {
     return this.usersService.editProfile(user.id, editProfileInput);
+  }
+
+  @Mutation(() => CheckPasswordOutput)
+  @UseGuards(AuthGuard)
+  checkPassword(
+    @AuthUser() user: User,
+    @Args('input') input: CheckPasswordInput,
+  ) {
+    return this.usersService.checkPassword(user.id, input);
   }
 
   @Mutation(() => SendVerifyEmailOutput)

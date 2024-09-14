@@ -12,7 +12,9 @@ export class PasswordResetToken extends CoreEntity {
   @Field(() => String)
   code: string;
 
-  @ManyToOne(() => User, (user) => user.passwordResetTokens)
+  @ManyToOne(() => User, (user) => user.passwordResetTokens, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 

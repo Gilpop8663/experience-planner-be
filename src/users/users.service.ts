@@ -343,9 +343,10 @@ export class UsersService {
     }
   }
 
-  async deleteAccount({
-    userId,
-  }: DeleteAccountInput): Promise<DeleteAccountOutput> {
+  async deleteAccount(
+    { userId }: DeleteAccountInput,
+    @Res() res: Response,
+  ): Promise<DeleteAccountOutput> {
     try {
       const user = await this.users.findOne({ where: { id: userId } });
 
@@ -354,6 +355,12 @@ export class UsersService {
       }
 
       await this.users.delete(userId);
+
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
 
       return { ok: true };
     } catch (error) {

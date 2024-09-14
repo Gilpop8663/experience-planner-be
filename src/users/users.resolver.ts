@@ -106,8 +106,11 @@ export class UsersResolver {
   }
 
   @Mutation(() => DeleteAccountOutput)
-  deleteAccount(@Args('input') input: DeleteAccountInput) {
-    return this.usersService.deleteAccount(input);
+  deleteAccount(
+    @Args('input') input: DeleteAccountInput,
+    @Context('res') res: Response,
+  ) {
+    return this.usersService.deleteAccount(input, res);
   }
 
   @Mutation(() => ForgotPasswordOutput)

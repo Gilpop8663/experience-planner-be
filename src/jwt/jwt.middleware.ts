@@ -23,6 +23,7 @@ export class JwtMiddleware implements NestMiddleware {
       'sendVerifyEmail',
       'forgotPassword',
       'createAccount',
+      'logout',
     ];
 
     const isExcludedAuthQuery = excludedAuthQueries.some((path) =>

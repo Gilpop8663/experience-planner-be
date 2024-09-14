@@ -15,7 +15,7 @@ export class Campaign extends CoreEntity {
   title: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
   @Column()

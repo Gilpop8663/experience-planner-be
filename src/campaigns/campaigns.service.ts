@@ -231,12 +231,13 @@ export class CampaignsService {
 
     const title = $('div.text-lg', 'div.w-full').eq(0).text().trim();
     const thumbnailUrl = '';
-    const deadlineString = $('div.col-span-7').text().split(' ');
-    const parsedDeadlineString = (
-      deadlineString[0] +
-      deadlineString[2] +
-      deadlineString[3]
-    ).replaceAll('/', '.');
+    const deadlineString = $('div.font-bold:contains("리뷰 마감")')
+      .eq(0)
+      .next()
+      .text()
+      .split(' ')[0];
+
+    const parsedDeadlineString = `0.0 ~ ${deadlineString.replace('/', '.')}`;
 
     const reviewDeadline = this.getDeadlineDate(parsedDeadlineString);
     const serviceDetails = $('p.p-space', 'div.w-full').text().trim();
@@ -296,7 +297,7 @@ export class CampaignsService {
       detailedViewLink: linkUrl,
       platformName: PLATFORM_NAME.레뷰,
       thumbnailUrl,
-      reviewDeadline: this.getDeadlineDate('08.29~08.31'),
+      reviewDeadline,
       serviceDetails,
       location,
     });
@@ -304,6 +305,11 @@ export class CampaignsService {
     return campaign;
   }
 
+  /**
+   *
+   * @param dateString // "08.22 ~ 08.23" 형식
+   * @returns Date
+   */
   getDeadlineDate(dateString: string) {
     // "08.23" 부분 추출
     const endDateString = dateString.split('~')[1].trim();

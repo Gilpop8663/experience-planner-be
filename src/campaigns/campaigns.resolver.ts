@@ -25,6 +25,10 @@ import {
   GetCampaignDetailInput,
   GetCampaignDetailOutPut,
 } from './dtos/get-campaign-detail.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { UseGuards } from '@nestjs/common';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -65,7 +69,11 @@ export class CampaignsResolver {
   }
 
   @Query(() => GetCampaignDetailOutPut)
-  getCampaignDetail(@Args('input') input: GetCampaignDetailInput) {
-    return this.campaignService.getCampaignDetail(input);
+  @UseGuards(AuthGuard)
+  getCampaignDetail(
+    @Args('input') input: GetCampaignDetailInput,
+    @AuthUser() user: User,
+  ) {
+    return this.campaignService.getCampaignDetail(input, user.id);
   }
 }

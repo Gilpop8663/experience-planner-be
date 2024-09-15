@@ -451,9 +451,10 @@ export class CampaignsService {
     }
   }
 
-  async getCampaignDetail({
-    campaignId,
-  }: GetCampaignDetailInput): Promise<GetCampaignDetailOutPut> {
+  async getCampaignDetail(
+    { campaignId }: GetCampaignDetailInput,
+    userId: number,
+  ): Promise<GetCampaignDetailOutPut> {
     try {
       if (campaignId === 0)
         return {
@@ -463,7 +464,15 @@ export class CampaignsService {
 
       const campaign = await this.campaignRepository.findOne({
         where: { id: campaignId },
+        relations: ['user'],
       });
+
+      if (campaign.user.id !== userId) {
+        return {
+          ok: false,
+          error: '본인이 작성한 캠페인만 조회할 수 있습니다.',
+        };
+      }
 
       const formattedCampaign = {
         ...campaign,

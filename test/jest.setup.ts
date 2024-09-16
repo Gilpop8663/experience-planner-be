@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource, Repository } from 'typeorm';
-import { INestApplication } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  INestApplication,
+} from '@nestjs/common';
 import { AppModule } from 'src/app.module';
 import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -8,6 +12,8 @@ import { PasswordResetToken } from 'src/users/entities/passwordResetToken.entity
 import { MailService } from 'src/mail/mail.service';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { Verification } from 'src/users/entities/verification.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 let app: INestApplication;
 let dataSource: DataSource;
@@ -25,17 +31,33 @@ const mockMailService = {
   sendResetPasswordEmail: jest.fn().mockReturnValue(true),
 };
 
+export const TEST_USER_ID = 5;
+
 beforeEach(() => jest.useRealTimers());
 
 beforeAll(async () => {
+  const mockAuthGuard: CanActivate = {
+    canActivate: (context: ExecutionContext) => {
+      const gqlContext = GqlExecutionContext.create(context).getContext();
+      gqlContext['user'] = {
+        id: TEST_USER_ID,
+      };
+
+      return true;
+    },
+  };
+
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
+    .overrideGuard(AuthGuard)
+    .useValue(mockAuthGuard)
     .overrideProvider(MailService)
     .useValue(mockMailService)
     .compile();
 
   app = moduleFixture.createNestApplication();
+
   usersRepository = moduleFixture.get<Repository<User>>(
     getRepositoryToken(User),
   );

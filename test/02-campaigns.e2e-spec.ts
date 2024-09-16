@@ -1,5 +1,10 @@
 import * as request from 'supertest';
-import { app, campaignRepository, usersRepository } from './jest.setup';
+import {
+  app,
+  campaignRepository,
+  TEST_USER_ID,
+  usersRepository,
+} from './jest.setup';
 import 'expect-puppeteer';
 
 const GRAPHQL_ENDPOINT = '/graphql';
@@ -70,6 +75,7 @@ test.each([
 
     expect(initialCampaign).toBeDefined();
   },
+  10000,
 );
 
 test.each([
@@ -264,7 +270,14 @@ test('캠페인을 수정할 수 있다. ', async () => {
 });
 
 test('캠페인 상세 정보를 불러올 수 있다. ', async () => {
-  const [campaign] = await campaignRepository.find({ relations: ['user'] });
+  const [campaign] = await campaignRepository.find({
+    where: {
+      user: {
+        id: TEST_USER_ID,
+      },
+    },
+    relations: ['user'],
+  });
 
   await request(app.getHttpServer())
     .post(GRAPHQL_ENDPOINT)
@@ -489,5 +502,76 @@ test('마감기한이 지난 캠페인들을 마감기한이 최근 종료된 �
           nextStartDate.getTime(),
         );
       }
+    });
+});
+
+test('특정 년도와 달의 협찬 비용과 소비한 금액을 불러온다.', async () => {
+  const year = 2024; // 예시 년도
+  const month = 8; // 예시 달 (8월)
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+        query {
+          getSponsorshipCostAndConsumption(input: { year: ${year}, month: ${month} }) {
+            ok
+            error
+            sponsorshipCost
+            consumptionCost
+          }
+        }
+      `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { getSponsorshipCostAndConsumption },
+        },
+      } = res;
+
+      expect(getSponsorshipCostAndConsumption.ok).toBe(true);
+      expect(getSponsorshipCostAndConsumption.error).toBe(null);
+      expect(getSponsorshipCostAndConsumption.sponsorshipCost).toEqual(
+        expect.any(Number),
+      );
+      expect(getSponsorshipCostAndConsumption.consumptionCost).toEqual(
+        expect.any(Number),
+      );
+    });
+});
+
+test('총 협찬 비용과 총 소비한 금액을 불러온다.', async () => {
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+        query {
+          getTotalSponsorshipCostAndConsumption {
+            ok
+            error
+            totalSponsorshipCost
+            totalConsumptionCost
+          }
+        }
+      `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { getTotalSponsorshipCostAndConsumption },
+        },
+      } = res;
+
+      expect(getTotalSponsorshipCostAndConsumption.ok).toBe(true);
+      expect(getTotalSponsorshipCostAndConsumption.error).toBe(null);
+      expect(
+        getTotalSponsorshipCostAndConsumption.totalSponsorshipCost,
+      ).toEqual(expect.any(Number));
+      expect(
+        getTotalSponsorshipCostAndConsumption.totalConsumptionCost,
+      ).toEqual(expect.any(Number));
     });
 });

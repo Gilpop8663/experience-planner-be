@@ -10,7 +10,7 @@ import { Verification } from './entities/verification.entity';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
 import { UserProfileInput } from './dtos/user-profile.dto';
 import { MailService } from 'src/mail/mail.service';
-import { logErrorAndReturnFalse } from 'src/utils';
+import { getRandomNickname, logErrorAndReturnFalse } from 'src/utils';
 import {
   SendVerifyEmailInput,
   SendVerifyEmailOutput,
@@ -51,27 +51,25 @@ export class UsersService {
     private readonly mailService: MailService,
   ) {}
 
-  async createAccount({
-    email,
-    password,
-    nickname,
-  }: CreateAccountInput): Promise<{
+  async createAccount({ email, password }: CreateAccountInput): Promise<{
     ok: boolean;
     error?: string;
   }> {
     try {
-      const existEmail = await this.users.findOne({ where: { email } });
+      let nickname = getRandomNickname();
+
       const existNickname = await this.users.findOne({ where: { nickname } });
+      const existEmail = await this.users.findOne({ where: { email } });
       const verification = await this.verifications.findOne({
         where: { email },
       });
 
-      if (existEmail) {
-        return { ok: false, error: '이미 존재하는 이메일입니다.' };
+      if (existNickname) {
+        nickname = getRandomNickname();
       }
 
-      if (existNickname) {
-        return { ok: false, error: '이미 존재하는 닉네임입니다.' };
+      if (existEmail) {
+        return { ok: false, error: '이미 존재하는 이메일입니다.' };
       }
 
       if (!verification.verified) {

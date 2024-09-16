@@ -54,7 +54,6 @@ type CoreOutput {
 
 input CreateAccountInput {
   email: String!
-  nickname: String!
   password: String!
 }
 

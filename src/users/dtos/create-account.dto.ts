@@ -3,11 +3,7 @@ import { User } from '../entities/user.entity';
 import { CoreOutput } from 'src/common/dtos/output.dto';
 
 @InputType()
-export class CreateAccountInput extends PickType(User, [
-  'email',
-  'password',
-  'nickname',
-]) {}
+export class CreateAccountInput extends PickType(User, ['email', 'password']) {}
 
 @ObjectType()
 export class CreateAccountOutput extends CoreOutput {}

@@ -12,12 +12,11 @@ const GRAPHQL_ENDPOINT = '/graphql';
 const TEST_USER = {
   email: 'asdf1234@naver.com',
   password: '12341234',
-  nickname: '우드',
 };
 
 describe('AppController (e2e)', () => {
   beforeAll(async () => {
-    const createUser = async ({ email, nickname, password }) => {
+    const createUser = async ({ email, password }) => {
       await verificationRepository.save(
         verificationRepository.create({ email, verified: true }),
       );
@@ -29,7 +28,6 @@ describe('AppController (e2e)', () => {
           mutation {
             createAccount(
               input: { email: "${email}",
-               nickname: "${nickname}",
                 password: "${password}",  }
             ) {
               ok
@@ -43,7 +41,6 @@ describe('AppController (e2e)', () => {
     for (let index = 0; index < 5; index++) {
       await createUser({
         email: index,
-        nickname: index,
         password: index,
       });
     }
@@ -68,7 +65,6 @@ describe('AppController (e2e)', () => {
             mutation {
               createAccount(
                 input: { email: "${TEST_USER.email}",
-                 nickname: "${TEST_USER.nickname}",
                   password: "${TEST_USER.password}",  }
               ) {
                 ok
@@ -98,7 +94,6 @@ describe('AppController (e2e)', () => {
             mutation {
               createAccount(
                 input: { email: "${TEST_USER.email}",
-                 nickname: "test닉네임",
                   password: "${TEST_USER.password}",  }
               ) {
                 ok
@@ -117,36 +112,6 @@ describe('AppController (e2e)', () => {
 
           expect(createAccount.ok).toBe(false);
           expect(createAccount.error).toBe('이미 존재하는 이메일입니다.');
-        });
-    });
-
-    test('중복된 닉네임을 입력했을 때 생성되지 않는다.', () => {
-      return request(app.getHttpServer())
-        .post(GRAPHQL_ENDPOINT)
-        .send({
-          query: /* GraphQL */ `
-            mutation {
-              createAccount(
-                input: { email: "ggee@naver.com",
-                 nickname: "${TEST_USER.nickname}",
-                  password: "${TEST_USER.password}", }
-              ) {
-                ok
-                error
-              }
-            }
-          `,
-        })
-        .expect(200)
-        .expect((res) => {
-          const {
-            body: {
-              data: { createAccount },
-            },
-          } = res;
-
-          expect(createAccount.ok).toBe(false);
-          expect(createAccount.error).toBe('이미 존재하는 닉네임입니다.');
         });
     });
   });
@@ -225,37 +190,33 @@ describe('AppController (e2e)', () => {
   });
 });
 
-test.each([
-  [`${TEST_USER.nickname}tes`, true, null],
-  [TEST_USER.nickname, false, '이미 사용 중인 닉네임입니다.'],
-])(
-  '닉네임: %s를 중복 확인 한다. 중복 확인에 결과는 %s를 반환한다.',
-  (nickname, result, errorResult) => {
-    return request(app.getHttpServer())
-      .post(GRAPHQL_ENDPOINT)
-      .send({
-        query: /* GraphQL */ `
+test('닉네임을 중복 확인 한다. 중복이라면 결과는 false를 반환한다.', async () => {
+  const [user] = await usersRepository.find();
+
+  return request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
       mutation {
-        checkNickname(input: { nickname: "${nickname}" }) {
+        checkNickname(input: { nickname: "${user.nickname}" }) {
           ok
           error
         }
       }
     `,
-      })
-      .expect(200)
-      .expect((res) => {
-        const {
-          body: {
-            data: { checkNickname },
-          },
-        } = res;
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { checkNickname },
+        },
+      } = res;
 
-        expect(checkNickname.ok).toBe(result);
-        expect(checkNickname.error).toBe(errorResult);
-      });
-  },
-);
+      expect(checkNickname.ok).toBe(false);
+      expect(checkNickname.error).toBe('이미 사용 중인 닉네임입니다.');
+    });
+});
 
 test.each([
   [`asd${TEST_USER.email}`, true, null],

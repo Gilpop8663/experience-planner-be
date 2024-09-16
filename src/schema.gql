@@ -180,6 +180,25 @@ type GetExpiredCampaignListSortedByDeadlineOutput {
   ok: Boolean!
 }
 
+input GetSponsorshipCostAndConsumptionInput {
+  month: Float!
+  year: Float!
+}
+
+type GetSponsorshipCostAndConsumptionOutput {
+  consumptionCost: Float
+  error: String
+  ok: Boolean!
+  sponsorshipCost: Float
+}
+
+type GetTotalSponsorshipCostAndConsumptionOutput {
+  error: String
+  ok: Boolean!
+  totalConsumptionCost: Float
+  totalSponsorshipCost: Float
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -216,6 +235,8 @@ type Query {
   getCampaignDetail(input: GetCampaignDetailInput!): GetCampaignDetailOutPut!
   getCampaignListSortedByDeadline: GetCalendarCampaignListOutput!
   getExpiredCampaignListSortedByDeadline: GetExpiredCampaignListSortedByDeadlineOutput!
+  getSponsorshipCostAndConsumption(input: GetSponsorshipCostAndConsumptionInput!): GetSponsorshipCostAndConsumptionOutput!
+  getTotalSponsorshipCostAndConsumption: GetTotalSponsorshipCostAndConsumptionOutput!
   getUserProfile(input: UserProfileInput!): UserProfileOutput!
   me: User!
 }

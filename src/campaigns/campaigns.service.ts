@@ -35,6 +35,11 @@ import {
   GetCampaignDetailInput,
   GetCampaignDetailOutPut,
 } from './dtos/get-campaign-detail.dto';
+import {
+  GetSponsorshipCostAndConsumptionInput,
+  GetSponsorshipCostAndConsumptionOutput,
+} from './dtos/get-sponsorship-cost-and-consumption.dto';
+import { GetTotalSponsorshipCostAndConsumptionOutput } from './dtos/get-total-sponsorship-cost-and-consumption.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -280,6 +285,7 @@ export class CampaignsService {
     await browser.close();
 
     const title = $('h2.ng-binding').text().trim();
+
     const thumbnailUrl = '';
     const reviewDeadline = this.getDeadlineDate(
       $('div.title:contains("콘텐츠 등록기간")', 'div.mobile-aside')
@@ -289,7 +295,11 @@ export class CampaignsService {
     const serviceDetails = $('p', 'campaign-new-head-info').text().trim();
     // const isDelivery = $('dt:contains("링크")').next().text();
 
-    const location = $('button:contains("주소 복사")').prev().text().trim();
+    const locationString = $('button:contains("주소 복사")').prev().text();
+
+    const location = locationString.length > 0 ? locationString.trim() : '';
+
+    // console.log(title, reviewDeadline, serviceDetails, location);
 
     const campaign = this.campaignRepository.create({
       user,
@@ -484,6 +494,77 @@ export class CampaignsService {
       return logErrorAndReturnFalse(
         error,
         '캠페인 상세 정보를 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async getSponsorshipCostAndConsumption(
+    { month, year }: GetSponsorshipCostAndConsumptionInput,
+    userId: number,
+  ): Promise<GetSponsorshipCostAndConsumptionOutput> {
+    try {
+      const startDate = getKoreanTime(new Date(year, month - 1, 1, 0, 0, 0));
+      const endDate = getKoreanTime(new Date(year, month, 0, 23, 59, 59)); // 해당 월의 마지막 날 23:59:59
+
+      const campaignList = await this.campaignRepository.find({
+        where: {
+          user: { id: userId },
+          reviewDeadline: Between(startDate, endDate),
+        },
+      });
+
+      const sponsorshipCost = campaignList.reduce(
+        (accumulator, currentCampaign) => {
+          return accumulator + currentCampaign.serviceAmount;
+        },
+        0,
+      );
+
+      const consumptionCost = campaignList.reduce(
+        (accumulator, currentCampaign) => {
+          return accumulator + currentCampaign.extraAmount;
+        },
+        0,
+      );
+
+      return { ok: true, consumptionCost, sponsorshipCost };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 제공받은 금액 및 소비 금액을 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async getTotalSponsorshipCostAndConsumption(
+    userId: number,
+  ): Promise<GetTotalSponsorshipCostAndConsumptionOutput> {
+    try {
+      const campaignList = await this.campaignRepository.find({
+        where: {
+          user: { id: userId },
+        },
+      });
+
+      const totalSponsorshipCost = campaignList.reduce(
+        (accumulator, currentCampaign) => {
+          return accumulator + currentCampaign.serviceAmount;
+        },
+        0,
+      );
+
+      const totalConsumptionCost = campaignList.reduce(
+        (accumulator, currentCampaign) => {
+          return accumulator + currentCampaign.extraAmount;
+        },
+        0,
+      );
+
+      return { ok: true, totalSponsorshipCost, totalConsumptionCost };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 제공받은 금액 및 소비 금액을 불러오는 데 실패했습니다.',
       );
     }
   }

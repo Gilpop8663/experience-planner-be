@@ -29,6 +29,11 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import {
+  GetSponsorshipCostAndConsumptionInput,
+  GetSponsorshipCostAndConsumptionOutput,
+} from './dtos/get-sponsorship-cost-and-consumption.dto';
+import { GetTotalSponsorshipCostAndConsumptionOutput } from './dtos/get-total-sponsorship-cost-and-consumption.dto';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -75,5 +80,23 @@ export class CampaignsResolver {
     @AuthUser() user: User,
   ) {
     return this.campaignService.getCampaignDetail(input, user.id);
+  }
+
+  @Query(() => GetSponsorshipCostAndConsumptionOutput)
+  @UseGuards(AuthGuard)
+  getSponsorshipCostAndConsumption(
+    @Args('input') input: GetSponsorshipCostAndConsumptionInput,
+    @AuthUser() user: User,
+  ) {
+    return this.campaignService.getSponsorshipCostAndConsumption(
+      input,
+      user.id,
+    );
+  }
+
+  @Query(() => GetTotalSponsorshipCostAndConsumptionOutput)
+  @UseGuards(AuthGuard)
+  getTotalSponsorshipCostAndConsumption(@AuthUser() user: User) {
+    return this.campaignService.getTotalSponsorshipCostAndConsumption(user.id);
   }
 }

@@ -123,7 +123,7 @@ describe('AppController (e2e)', () => {
         .send({
           query: /* GraphQL */ `
           mutation {
-            login(input: { password: "${TEST_USER.password}", email: "${TEST_USER.email}" }) {
+            login(input: { password: "${TEST_USER.password}", email: "${TEST_USER.email}" , rememberMe: false}) {
               ok
               error
               token
@@ -151,7 +151,7 @@ describe('AppController (e2e)', () => {
         .send({
           query: /* GraphQL */ `
           mutation {
-            login(input: { password: "test", email: "${TEST_USER.email}" }) {
+            login(input: { password: "test", email: "${TEST_USER.email}" , rememberMe: false}) {
               ok
               error
               token
@@ -357,7 +357,7 @@ test('비밀번호 찾기를 한다. 이메일로 토큰이 담긴 링크를 보
     .send({
       query: /* GraphQL */ `
     mutation {
-      login(input: { email: "${initialUser.email}", password: "${newPassword}" }) {
+      login(input: { email: "${initialUser.email}", password: "${newPassword}" , rememberMe: false}) {
         ok
         token
         error

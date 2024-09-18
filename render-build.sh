@@ -7,7 +7,6 @@ npm install
 
 npx puppeteer browsers install chrome
 
-
 npm run build  # 빌드가 필요한 경우 주석을 해제합니다.
 
 # Puppeteer 캐시를 빌드 캐시에서 불러오기 또는 저장하기

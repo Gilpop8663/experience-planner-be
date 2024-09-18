@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { getKoreanTime, logErrorAndReturnFalse } from 'src/utils';
 import { Campaign } from './entities/campaign.entity';
+import * as https from 'https';
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -154,10 +155,9 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 15000,
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }), // SSL 무시
+      timeout: 30000,
     });
-
-    console.log(response.request);
 
     const html = response.data;
     const $ = cheerio.load(html);
@@ -230,7 +230,7 @@ export class CampaignsService {
   async getReviewNoteCampaign(user: User, linkUrl: string) {
     const response = await axios.get(linkUrl, {
       headers: {
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36':
+        'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
       timeout: 15000,

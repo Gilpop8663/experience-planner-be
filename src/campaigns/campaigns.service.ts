@@ -151,7 +151,7 @@ export class CampaignsService {
   async getGangnamMatzipCampaign(user: User, linkUrl: string) {
     const response = await axios.get(linkUrl, {
       headers: {
-        setUserAgent:
+        'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
       timeout: 10000,
@@ -187,7 +187,7 @@ export class CampaignsService {
   async getMrblogCampaign(user: User, linkUrl: string) {
     const response = await axios.get(linkUrl, {
       headers: {
-        setUserAgent:
+        'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
       timeout: 10000,
@@ -228,7 +228,7 @@ export class CampaignsService {
   async getReviewNoteCampaign(user: User, linkUrl: string) {
     const response = await axios.get(linkUrl, {
       headers: {
-        setUserAgent:
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
       timeout: 10000,

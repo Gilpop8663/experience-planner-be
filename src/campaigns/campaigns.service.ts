@@ -154,8 +154,10 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 10000,
+      timeout: 15000,
     });
+
+    console.log(response.request);
 
     const html = response.data;
     const $ = cheerio.load(html);
@@ -190,7 +192,7 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 10000,
+      timeout: 15000,
     });
 
     const html = response.data;
@@ -231,7 +233,7 @@ export class CampaignsService {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 10000,
+      timeout: 15000,
     });
 
     const html = response.data;

@@ -90,12 +90,13 @@ export class UsersService {
     }
   }
 
-  async login({ email, password }: LoginInput, @Res() res: Response) {
+  async login(
+    { email, password, rememberMe }: LoginInput,
+    @Res() res: Response,
+  ) {
     try {
       const user = await this.users.findOne({
-        where: {
-          email,
-        },
+        where: { email },
         select: ['password', 'id'],
       });
 
@@ -107,7 +108,6 @@ export class UsersService {
       }
 
       const isPasswordCorrect = await user.checkPassword(password);
-
       if (!isPasswordCorrect) {
         return {
           ok: false,
@@ -115,25 +115,27 @@ export class UsersService {
         };
       }
 
-      // 액세스 토큰 생성
+      // 액세스 토큰 생성 (1시간 만료)
       const accessToken = this.jwtService.sign(
         { id: user.id },
         { expiresIn: '1h' },
       );
 
-      // 리프레시 토큰 생성 (예: 7일 만료)
+      // rememberMe에 따른 리프레시 토큰 만료 시간 설정
+      const refreshTokenExpiry = rememberMe ? '7d' : '1h'; // 자동 로그인 시 7일, 그렇지 않으면 1시간
+
+      // 리프레시 토큰 생성
       const refreshToken = this.jwtService.sign(
-        { id: user.id },
-        { expiresIn: '7d' },
+        { id: user.id, rememberMe },
+        { expiresIn: refreshTokenExpiry },
       );
 
       // 리프레시 토큰을 쿠키에 저장
       res.cookie('refreshToken', refreshToken, {
-        httpOnly: true, // 클라이언트 JavaScript로 접근 불가
-        secure: process.env.NODE_ENV === 'production', // HTTPS에서만 전송 (프로덕션에서 사용)
-        // sameSite: 'strict', // 크로스 사이트 요청 제한
-        sameSite: 'lax', // 크로스 사이트 요청 제한
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일간 유효
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000, // rememberMe에 따른 만료 시간 설정
       });
 
       return {
@@ -157,16 +159,20 @@ export class UsersService {
         { expiresIn: '1h' },
       );
 
+      const rememberMe = decoded['rememberMe'];
+
+      const refreshTokenExpiry = rememberMe ? '7d' : '1h'; // 자동 로그인 시 7일, 그렇지 않으면 1시간
+
       const newRefreshToken = this.jwtService.sign(
-        { id: result.user.id },
-        { expiresIn: '7d' },
+        { id: result.user.id, rememberMe },
+        { expiresIn: refreshTokenExpiry },
       );
 
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7일간 유효
+        maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000, // rememberMe에 따른 만료 시간 설정
       });
 
       return {

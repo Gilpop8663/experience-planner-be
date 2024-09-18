@@ -1,8 +1,9 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { IsNumber, IsString, Length } from 'class-validator';
+import { IsNumber, IsString, Length, Max, Min } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
+import { AMOUNT } from '../constants';
 
 @InputType({ isAbstract: true })
 @ObjectType()
@@ -46,11 +47,15 @@ export class Campaign extends CoreEntity {
   @Column({ default: 0 })
   @Field(() => Number)
   @IsNumber()
+  @Max(AMOUNT.MAX)
+  @Min(AMOUNT.MIN)
   serviceAmount: number;
 
   @Column({ default: 0 })
   @Field(() => Number)
   @IsNumber()
+  @Max(AMOUNT.MAX)
+  @Min(AMOUNT.MIN)
   extraAmount: number;
 
   @Column()

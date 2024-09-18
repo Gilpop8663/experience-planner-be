@@ -25,7 +25,7 @@ export class MailService {
     try {
       const form = new FormData();
 
-      form.append('from', `Excited User <mailgun@${this.options.domain}>`);
+      form.append('from', `체험단플래너 <postmaster@${this.options.domain}>`);
       form.append('to', `${to}`);
       form.append('subject', `${subject}`);
       form.append('template', template);
@@ -33,7 +33,7 @@ export class MailService {
         form.append(`v:${emailVar.key}`, emailVar.value);
       });
 
-      await fetch(
+      const response = await fetch(
         `https://api.mailgun.net/v3/${this.options.domain}/messages`,
         {
           method: 'POST',
@@ -45,6 +45,10 @@ export class MailService {
           body: form,
         },
       );
+
+      const result = await response.json();
+
+      console.log(result);
     } catch (error) {
       logErrorAndReturnFalse(error, '이메일 전송에 실패했습니다.');
     }
@@ -54,7 +58,7 @@ export class MailService {
     this.sendEmail({
       to: email,
       template: 'verify-email',
-      subject: '[체험단 플래너] 이메일 인증이 도착했습니다.',
+      subject: '[체험단플래너] 이메일 인증이 도착했습니다.',
       emailVars: [{ key: 'code', value: code }],
     });
   }
@@ -71,7 +75,7 @@ export class MailService {
     this.sendEmail({
       to: email,
       template: 'reset-password',
-      subject: '[체험단 플래너] 비밀번호 재설정 링크가 도착했습니다.',
+      subject: '[체험단플래너] 비밀번호 재설정 링크가 도착했습니다.',
       emailVars: [
         { key: 'code', value: code },
         { key: 'nickname', value: nickname },

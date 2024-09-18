@@ -4,3 +4,8 @@ export const PLATFORM_NAME = {
   미블: '미블',
   리뷰노트: '리뷰노트',
 };
+
+export const AMOUNT = {
+  MIN: 0,
+  MAX: 1000000000,
+};

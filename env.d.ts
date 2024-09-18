@@ -9,7 +9,6 @@ declare module NodeJS {
     JWT_SECRET_KEY: string;
     MAILGUN_API_KEY: string;
     MAILGUN_DOMAIN_NAME: string;
-    MAILGUN_FROM_EMAIL: string;
     PORT: number;
     DATABASE_URL: string;
     SOLAPI_API_KEY: string;

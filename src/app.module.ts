@@ -53,7 +53,6 @@ const getEnvFilePath = () => {
         JWT_SECRET_KEY: Joi.string(),
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN_NAME: Joi.string().required(),
-        MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -96,7 +95,6 @@ const getEnvFilePath = () => {
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
       domain: process.env.MAILGUN_DOMAIN_NAME,
-      fromEmail: process.env.MAILGUN_FROM_EMAIL,
     }),
     CampaignsModule,
   ],

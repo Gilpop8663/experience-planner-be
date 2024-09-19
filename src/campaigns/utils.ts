@@ -30,6 +30,20 @@ export const getDeadlineDate = (dateString: string) => {
 };
 
 /**
+ * 날짜가 들어오면 해당 날의 23시 59분 59초로 되도록 하는 함수
+ * @param inputDate
+ * @returns
+ */
+export const getEndOfDay = (inputDate: Date) => {
+  const date = new Date(inputDate);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  return new Date(year, month, day, 23, 59, 59);
+};
+
+/**
 * 강남맛집 콘텐츠를 파싱하는 함수
 *  파싱 로직을 구현하여 콘텐츠에서 필요한 데이터를 추출합니다.
    예를 들어, 정규 표현식이나 특정 형식에 맞게 파싱할 수 있습니다.

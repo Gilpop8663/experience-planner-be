@@ -45,7 +45,12 @@ import {
   CreateGangnamCampaignInput,
   CreateGangnamCampaignOutput,
 } from './dtos/create-gangnam-campaign';
-import { getDeadlineDate, getPlatformName, parseGangnamContent } from './utils';
+import {
+  getDeadlineDate,
+  getEndOfDay,
+  getPlatformName,
+  parseGangnamContent,
+} from './utils';
 
 @Injectable()
 export class CampaignsService {
@@ -77,7 +82,7 @@ export class CampaignsService {
 
       const campaign = this.campaignRepository.create({
         title,
-        reviewDeadline,
+        reviewDeadline: getEndOfDay(reviewDeadline),
         thumbnailUrl: '',
         location,
         platformName,
@@ -85,7 +90,10 @@ export class CampaignsService {
         detailedViewLink,
         serviceAmount,
         user,
-        reservationDate,
+        reservationDate:
+          new Date(reservationDate).toISOString() === '1970-01-01T00:00:00.000Z'
+            ? null
+            : reservationDate,
         extraAmount,
       });
 
@@ -115,7 +123,7 @@ export class CampaignsService {
       if (platformName === PLATFORM_NAME.강남맛집) {
         return {
           ok: false,
-          error: `강남맛집 플랫폼은 URL 등록이 지원되지 않습니다. 강남맛집 입력 탭으로 이동해서 진행해주세요.`,
+          error: `강남맛집 플랫폼은 URL 등록이 지원되지 않습니다. 강남맛집 본문 등록 탭으로 이동해서 진행해주세요.`,
         };
       } else if (platformName === PLATFORM_NAME.레뷰) {
         campaign = await this.getRevuCampaign(user, detailedViewLink);
@@ -369,7 +377,7 @@ export class CampaignsService {
         extraAmount,
         serviceDetails,
         serviceAmount,
-        reviewDeadline,
+        reviewDeadline: getEndOfDay(reviewDeadline),
         detailedViewLink,
         reservationDate:
           new Date(reservationDate).toISOString() === '1970-01-01T00:00:00.000Z'

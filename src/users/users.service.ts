@@ -38,6 +38,7 @@ import {
   CheckPasswordInput,
   CheckPasswordOutput,
 } from './dtos/check-password.dto';
+import { cookieDomain } from './constant';
 
 @Injectable()
 export class UsersService {
@@ -136,6 +137,7 @@ export class UsersService {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000, // rememberMe에 따른 만료 시간 설정
+        domain: cookieDomain,
       });
 
       return {
@@ -173,6 +175,7 @@ export class UsersService {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000, // rememberMe에 따른 만료 시간 설정
+        domain: cookieDomain,
       });
 
       return {
@@ -190,6 +193,7 @@ export class UsersService {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
+        domain: cookieDomain,
       });
 
       return {
@@ -364,6 +368,7 @@ export class UsersService {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
+        domain: cookieDomain,
       });
 
       return { ok: true };

@@ -30,7 +30,6 @@ export class JwtMiddleware implements NestMiddleware {
       (path) =>
         req.body?.query &&
         typeof req.body.query === 'string' &&
-        req.body.query.includes(path) &&
         req.body.query.includes(path),
     );
 

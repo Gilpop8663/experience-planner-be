@@ -26,8 +26,12 @@ export class JwtMiddleware implements NestMiddleware {
       'logout',
     ];
 
-    const isExcludedAuthQuery = excludedAuthQueries.some((path) =>
-      req.body.query.includes(path),
+    const isExcludedAuthQuery = excludedAuthQueries.some(
+      (path) =>
+        req.body?.query &&
+        typeof req.body.query === 'string' &&
+        req.body.query.includes(path) &&
+        req.body.query.includes(path),
     );
 
     if (isExcludedAuthQuery) {

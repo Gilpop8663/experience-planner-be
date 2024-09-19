@@ -156,7 +156,7 @@ export class CampaignsService {
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
       httpsAgent: new https.Agent({ rejectUnauthorized: false }), // SSL 무시
-      timeout: 30000,
+      timeout: 10000,
     });
 
     const html = response.data;
@@ -192,7 +192,7 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 15000,
+      timeout: 10000,
     });
 
     const html = response.data;
@@ -233,7 +233,7 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 15000,
+      timeout: 10000,
     });
 
     const html = response.data;

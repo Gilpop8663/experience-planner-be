@@ -104,7 +104,10 @@ export class CampaignsService {
       let campaign: Campaign;
 
       if (platformName === PLATFORM_NAME.강남맛집) {
-        campaign = await this.getGangnamMatzipCampaign(user, detailedViewLink);
+        return {
+          ok: false,
+          error: `강남맛집 플랫폼은 현재 지원되지 않습니다.`,
+        };
       } else if (platformName === PLATFORM_NAME.레뷰) {
         campaign = await this.getRevuCampaign(user, detailedViewLink);
       } else if (platformName === PLATFORM_NAME.리뷰노트) {
@@ -192,7 +195,7 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 10000,
+      timeout: 15000,
     });
 
     const html = response.data;
@@ -233,7 +236,7 @@ export class CampaignsService {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
       },
-      timeout: 10000,
+      timeout: 15000,
     });
 
     const html = response.data;

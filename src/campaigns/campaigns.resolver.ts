@@ -34,6 +34,10 @@ import {
   GetSponsorshipCostAndConsumptionOutput,
 } from './dtos/get-sponsorship-cost-and-consumption.dto';
 import { GetTotalSponsorshipCostAndConsumptionOutput } from './dtos/get-total-sponsorship-cost-and-consumption.dto';
+import {
+  CreateGangnamCampaignInput,
+  CreateGangnamCampaignOutput,
+} from './dtos/create-gangnam-campaign';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -46,6 +50,11 @@ export class CampaignsResolver {
   @Mutation(() => CreateCampaignDirectlyOutput)
   createCampaignDirectly(@Args('input') input: CreateCampaignDirectlyInput) {
     return this.campaignService.createCampaignDirectly(input);
+  }
+
+  @Mutation(() => CreateGangnamCampaignOutput)
+  createGangnamCampaign(@Args('input') input: CreateGangnamCampaignInput) {
+    return this.campaignService.createGangnamCampaign(input);
   }
 
   @Mutation(() => DeleteCampaignOutput)

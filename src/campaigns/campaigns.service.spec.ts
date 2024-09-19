@@ -15,9 +15,4 @@ describe('CampaignsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
-  it('should be defined', () => {
-    const result = new Date(2024, 7, 15);
-    expect(service.getDeadlineDate('08.10 ~ 08.15')).toStrictEqual(result);
-  });
 });

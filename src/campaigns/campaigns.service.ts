@@ -41,6 +41,11 @@ import {
   GetSponsorshipCostAndConsumptionOutput,
 } from './dtos/get-sponsorship-cost-and-consumption.dto';
 import { GetTotalSponsorshipCostAndConsumptionOutput } from './dtos/get-total-sponsorship-cost-and-consumption.dto';
+import {
+  CreateGangnamCampaignInput,
+  CreateGangnamCampaignOutput,
+} from './dtos/create-gangnam-campaign';
+import { getDeadlineDate, getPlatformName, parseGangnamContent } from './utils';
 
 @Injectable()
 export class CampaignsService {
@@ -97,7 +102,7 @@ export class CampaignsService {
     userId,
   }: CreateCampaignFromLinkInput): Promise<CreateCampaignFromLinkOutput> {
     try {
-      const platformName = this.getPlatformName(detailedViewLink);
+      const platformName = getPlatformName(detailedViewLink);
 
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
@@ -110,7 +115,7 @@ export class CampaignsService {
       if (platformName === PLATFORM_NAME.강남맛집) {
         return {
           ok: false,
-          error: `강남맛집 플랫폼은 현재 지원되지 않습니다.`,
+          error: `강남맛집 플랫폼은 URL 등록이 지원되지 않습니다. 강남맛집 입력 탭으로 이동해서 진행해주세요.`,
         };
       } else if (platformName === PLATFORM_NAME.레뷰) {
         campaign = await this.getRevuCampaign(user, detailedViewLink);
@@ -129,30 +134,38 @@ export class CampaignsService {
     }
   }
 
-  getPlatformName(linkUrl: string) {
-    const parsedLinkUrl = linkUrl.split('https://')[1];
+  async createGangnamCampaign({
+    siteContent,
+    userId,
+  }: CreateGangnamCampaignInput): Promise<CreateGangnamCampaignOutput> {
+    try {
+      const { title, location, reviewDeadline, serviceDetails } =
+        parseGangnamContent(siteContent);
 
-    const SITE_NAME = {
-      강남맛집: 'xn--939au0g4vj8sq',
-      레뷰: 'www.revu.net',
-      리뷰노트: 'reviewnote',
-      미블: 'mrblog',
-    };
+      const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    if (parsedLinkUrl.includes(SITE_NAME.강남맛집)) {
-      return PLATFORM_NAME.강남맛집;
-    }
+      if (!user) {
+        return { ok: false, error: '유저가 존재하지 않습니다.' };
+      }
 
-    if (parsedLinkUrl.includes(SITE_NAME.레뷰)) {
-      return PLATFORM_NAME.레뷰;
-    }
+      // 3. 캠페인 생성
+      const campaign = this.campaignRepository.create({
+        title,
+        location,
+        reviewDeadline,
+        serviceDetails,
+        thumbnailUrl: '',
+        platformName: PLATFORM_NAME.강남맛집,
+        user,
+      });
 
-    if (parsedLinkUrl.includes(SITE_NAME.리뷰노트)) {
-      return PLATFORM_NAME.리뷰노트;
-    }
+      // 4. 캠페인 저장
+      await this.campaignRepository.save(campaign);
 
-    if (parsedLinkUrl.includes(SITE_NAME.미블)) {
-      return PLATFORM_NAME.미블;
+      return { ok: true, campaignId: campaign.id };
+    } catch (error) {
+      console.error(error);
+      return logErrorAndReturnFalse(error, '캠페인 생성에 실패했습니다.');
     }
   }
 
@@ -175,7 +188,7 @@ export class CampaignsService {
       .next()
       .text()
       .trim();
-    const reviewDeadline = this.getDeadlineDate(deadlineString);
+    const reviewDeadline = getDeadlineDate(deadlineString);
     const serviceDetails = $('.sub_tit', '.textArea').text().trim();
     const location = $('#cont_map').next().text().trim();
 
@@ -216,7 +229,7 @@ export class CampaignsService {
         return item.trim().slice(5);
       })
       .join('~');
-    const reviewDeadline = this.getDeadlineDate(deadlineString);
+    const reviewDeadline = getDeadlineDate(deadlineString);
     const serviceDetails = $('.data').eq(2).text().trim();
     const location = $('.map_area').next('.data').text().trim();
 
@@ -256,7 +269,7 @@ export class CampaignsService {
 
     const parsedDeadlineString = `0.0 ~ ${deadlineString.replace('/', '.')}`;
 
-    const reviewDeadline = this.getDeadlineDate(parsedDeadlineString);
+    const reviewDeadline = getDeadlineDate(parsedDeadlineString);
     const serviceDetails = $('p.p-space', 'div.w-full').text().trim();
     const location = $('div.text-lg:contains("방문 주소")')
       .next()
@@ -299,19 +312,16 @@ export class CampaignsService {
     const title = $('h2.ng-binding').text().trim();
 
     const thumbnailUrl = '';
-    const reviewDeadline = this.getDeadlineDate(
+    const reviewDeadline = getDeadlineDate(
       $('div.title:contains("콘텐츠 등록기간")', 'div.mobile-aside')
         .next()
         .text(),
     );
     const serviceDetails = $('p', 'campaign-new-head-info').text().trim();
-    // const isDelivery = $('dt:contains("링크")').next().text();
 
     const locationString = $('button:contains("주소 복사")').prev().text();
 
     const location = locationString.length > 0 ? locationString.trim() : '';
-
-    // console.log(title, reviewDeadline, serviceDetails, location);
 
     const campaign = this.campaignRepository.create({
       user,
@@ -325,33 +335,6 @@ export class CampaignsService {
     });
 
     return campaign;
-  }
-
-  /**
-   *
-   * @param dateString // "08.22 ~ 08.23" 형식
-   * @returns Date
-   */
-  getDeadlineDate(dateString: string) {
-    // "08.23" 부분 추출
-    const endDateString = dateString.split('~')[1].trim();
-
-    // 날짜 형식 변환
-    const [month, day] = endDateString.split('.').map(Number);
-    const currentYear = new Date().getFullYear(); // 현재 연도
-    const today = new Date(); // 오늘 날짜
-
-    // Date 객체 생성
-    const endDate = new Date(currentYear, month - 1, day, 23, 59, 59); // 월은 0부터 시작하므로 -1
-
-    // 만약 endDate가 오늘 날짜보다 이전이라면, 다음 연도로 설정
-    if (endDate < today) {
-      endDate.setFullYear(currentYear + 1);
-    }
-
-    const koreanEndDate = getKoreanTime(endDate);
-
-    return koreanEndDate;
   }
 
   async deleteCampaign({

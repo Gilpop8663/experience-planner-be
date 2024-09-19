@@ -19,11 +19,11 @@ export class Campaign extends CoreEntity {
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   user: User;
 
-  @Column()
+  @Column({ default: '' })
   @Field(() => String)
   platformName: string;
 
-  @Column()
+  @Column({ default: '' })
   @Field(() => String)
   @IsString()
   thumbnailUrl: string;
@@ -39,7 +39,7 @@ export class Campaign extends CoreEntity {
   @Field(() => Date)
   reviewDeadline: Date;
 
-  @Column()
+  @Column({ default: '' })
   @Field(() => String)
   @IsString()
   serviceDetails: string;
@@ -58,11 +58,11 @@ export class Campaign extends CoreEntity {
   @Min(AMOUNT.MIN)
   extraAmount: number;
 
-  @Column()
+  @Column({ default: '' })
   @Field(() => String)
   location: string;
 
-  @Column()
+  @Column({ default: '' })
   @Field(() => String)
   detailedViewLink: string;
 }

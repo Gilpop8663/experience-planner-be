@@ -92,6 +92,17 @@ type CreateCampaignFromLinkOutput {
   ok: Boolean!
 }
 
+input CreateGangnamCampaignInput {
+  siteContent: String!
+  userId: Float!
+}
+
+type CreateGangnamCampaignOutput {
+  campaignId: Float
+  error: String
+  ok: Boolean!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -217,6 +228,7 @@ type Mutation {
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
   createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
   createCampaignFromLink(input: CreateCampaignFromLinkInput!): CreateCampaignFromLinkOutput!
+  createGangnamCampaign(input: CreateGangnamCampaignInput!): CreateGangnamCampaignOutput!
   deleteAccount(input: DeleteAccountInput!): DeleteAccountOutput!
   deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignOutput!
   editCampaign(input: EditCampaignInput!): EditCampaignOutput!

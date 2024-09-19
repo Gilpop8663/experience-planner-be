@@ -165,6 +165,7 @@ export class CampaignsService {
         thumbnailUrl: '',
         platformName: PLATFORM_NAME.강남맛집,
         user,
+        detailedViewLink: 'https://xn--939au0g4vj8sq.net/mypage/index.php',
       });
 
       // 4. 캠페인 저장

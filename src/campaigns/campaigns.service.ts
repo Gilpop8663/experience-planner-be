@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Between, LessThan, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { getKoreanTime, logErrorAndReturnFalse } from 'src/utils';
+import { logErrorAndReturnFalse } from 'src/utils';
 import { Campaign } from './entities/campaign.entity';
 import * as https from 'https';
 
@@ -397,8 +397,8 @@ export class CampaignsService {
     month,
   }: GetCalendarCampaignListInput): Promise<GetCalendarCampaignListOutput> {
     try {
-      const startDate = getKoreanTime(new Date(year, month - 1, 1, 0, 0, 0));
-      const endDate = getKoreanTime(new Date(year, month, 0, 23, 59, 59)); // 해당 월의 마지막 날 23:59:59
+      const startDate = new Date(year, month - 1, 1, 0, 0, 0);
+      const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
 
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: Between(startDate, endDate) },
@@ -421,7 +421,7 @@ export class CampaignsService {
 
   async getCampaignListSortedByDeadline(): Promise<GetCampaignListSortedByDeadlineOutput> {
     try {
-      const currentDate = getKoreanTime();
+      const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: MoreThan(currentDate) },
@@ -444,7 +444,7 @@ export class CampaignsService {
 
   async getExpiredCampaignListSortedByDeadline(): Promise<GetExpiredCampaignListSortedByDeadlineOutput> {
     try {
-      const currentDate = getKoreanTime();
+      const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: LessThan(currentDate) },
@@ -507,8 +507,8 @@ export class CampaignsService {
     userId: number,
   ): Promise<GetSponsorshipCostAndConsumptionOutput> {
     try {
-      const startDate = getKoreanTime(new Date(year, month - 1, 1, 0, 0, 0));
-      const endDate = getKoreanTime(new Date(year, month, 0, 23, 59, 59)); // 해당 월의 마지막 날 23:59:59
+      const startDate = new Date(year, month - 1, 1, 0, 0, 0);
+      const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
 
       const campaignList = await this.campaignRepository.find({
         where: {

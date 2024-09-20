@@ -1,4 +1,3 @@
-import { getKoreanTime } from 'src/utils';
 import { getDeadlineDate, parseGangnamContent } from './utils';
 import { GANGNAM_DATA } from './siteContentData';
 
@@ -6,17 +5,23 @@ describe('getDeadlineDate', () => {
   it('should return the correct end date for the given date string', () => {
     // 테스트 케이스 1: 일반적인 경우
     const dateString = '08.22 ~ 08.23';
-    const expectedDate = getKoreanTime(
-      new Date(new Date().getFullYear(), 7, 23, 23, 59, 59),
-    ); // 08.23, 현재 연도
+    const expectedDate = new Date(new Date().getFullYear(), 7, 23, 23, 59, 59);
+    // 08.23, 현재 연도
     const result = getDeadlineDate(dateString);
     expect(result).toStrictEqual(expectedDate);
 
     // 테스트 케이스 2: 현재 날짜가 종료 날짜보다 이후일 때
     const pastDateString = '08.22 ~ 08.21'; // 올해 8월 21일
-    const nextYearDate = getKoreanTime(
-      new Date(new Date().getFullYear() + 1, 7, 21, 23, 59, 59),
-    ); // 다음 해 08.21
+    const nextYearDate = new Date(
+      new Date().getFullYear() + 1,
+      7,
+      21,
+      23,
+      59,
+      59,
+    );
+
+    // 다음 해 08.21
     const pastResult = getDeadlineDate(pastDateString);
     expect(pastResult).toStrictEqual(nextYearDate);
 
@@ -28,16 +33,21 @@ describe('getDeadlineDate', () => {
   it('should return the correct end date for the given date string', () => {
     // 테스트 케이스 1: 일반적인 경우
     const dateString = '08.22 ~ 08.23';
-    const expectedDate = getKoreanTime(
-      new Date(new Date().getFullYear(), 7, 23, 23, 59, 59),
-    ); // 08.23, 현재 연도
+    const expectedDate = new Date(new Date().getFullYear(), 7, 23, 23, 59, 59);
+
+    // 08.23, 현재 연도
     const result = getDeadlineDate(dateString);
     expect(result).toStrictEqual(expectedDate);
 
     // 테스트 케이스 2: 현재 날짜가 종료 날짜보다 이후일 때
     const pastDateString = '08.22 ~ 08.21'; // 올해 8월 21일
-    const nextYearDate = getKoreanTime(
-      new Date(new Date().getFullYear() + 1, 7, 21, 23, 59, 59),
+    const nextYearDate = new Date(
+      new Date().getFullYear() + 1,
+      7,
+      21,
+      23,
+      59,
+      59,
     ); // 다음 해 08.21
     const pastResult = getDeadlineDate(pastDateString);
     expect(pastResult).toStrictEqual(nextYearDate);
@@ -219,3 +229,7 @@ test.each([
     expect(result).toStrictEqual(expectResult);
   },
 );
+
+it('should ', () => {
+  console.log(new Date());
+});

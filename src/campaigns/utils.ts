@@ -1,4 +1,3 @@
-import { getKoreanTime } from 'src/utils';
 import { ParsedGangnamContent } from './types';
 import { PLATFORM_NAME } from './constants';
 
@@ -24,9 +23,7 @@ export const getDeadlineDate = (dateString: string) => {
     endDate.setFullYear(currentYear + 1);
   }
 
-  const koreanEndDate = getKoreanTime(endDate);
-
-  return koreanEndDate;
+  return endDate;
 };
 
 /**
@@ -97,8 +94,6 @@ export const parseGangnamContent = (content: string): ParsedGangnamContent => {
       info.location = contentAfterNaver[1].trim();
     }
   }
-
-  console.log(info);
 
   return info;
 };

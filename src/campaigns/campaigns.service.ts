@@ -371,20 +371,29 @@ export class CampaignsService {
     reservationDate,
   }: EditCampaignInput): Promise<EditCampaignOutput> {
     try {
-      await this.campaignRepository.update(campaignId, {
+      const updateData: Partial<EditCampaignInput> = {
         title,
         location,
         platformName,
         extraAmount,
         serviceDetails,
         serviceAmount,
-        reviewDeadline: getEndOfDay(reviewDeadline),
+        reviewDeadline: reviewDeadline
+          ? getEndOfDay(reviewDeadline)
+          : undefined,
         detailedViewLink,
         reservationDate:
           new Date(reservationDate).toISOString() === '1970-01-01T00:00:00.000Z'
             ? null
             : reservationDate,
-      });
+      };
+
+      // undefined인 필드 제거
+      const filteredUpdateData = Object.fromEntries(
+        Object.entries(updateData).filter(([_, value]) => value !== undefined),
+      );
+
+      await this.campaignRepository.update(campaignId, filteredUpdateData);
 
       return { ok: true };
     } catch (error) {
@@ -425,7 +434,7 @@ export class CampaignsService {
 
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: MoreThan(currentDate) },
-        order: { reviewDeadline: 'ASC' },
+        order: { reviewDeadline: 'ASC', createdAt: 'ASC' },
       });
 
       const formattedCampaigns = campaign.map((item) => ({
@@ -448,7 +457,7 @@ export class CampaignsService {
 
       const campaign = await this.campaignRepository.find({
         where: { reviewDeadline: LessThan(currentDate) },
-        order: { reviewDeadline: 'DESC' },
+        order: { reviewDeadline: 'DESC', createdAt: 'ASC' },
       });
 
       const formattedCampaigns = campaign.map((item) => ({

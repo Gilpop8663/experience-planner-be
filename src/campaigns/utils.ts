@@ -84,6 +84,17 @@ export const parseGangnamContent = (content: string): ParsedGangnamContent => {
     info.reviewDeadline = getDeadlineDate(reviewPeriodMatch[1]);
   }
 
+  // 4. 지역: '지역'이라는 문구가 있을 경우 해당 줄 추출
+  const locationMatch = content.includes('방문 및 예약');
+
+  if (!locationMatch) {
+    const location = content.split('지역')[2].trim().split('\n')[0];
+
+    info.location = location;
+
+    return info;
+  }
+
   // 4. 지역: '© NAVER Corp.' 이후 1줄을 지역 정보로 추출
   const naverIndex = content.indexOf('© NAVER Corp.');
   if (naverIndex !== -1) {

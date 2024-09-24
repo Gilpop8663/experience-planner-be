@@ -33,7 +33,7 @@ export class Campaign extends CoreEntity {
 
   @Column({ default: false })
   @Field(() => Boolean)
-  isExpired: boolean;
+  isReviewCompleted: boolean;
 
   @Column({ default: null, nullable: true })
   @Field(() => Date, { nullable: true })

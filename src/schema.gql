@@ -7,8 +7,8 @@ type Campaign {
   detailedViewLink: String!
   extraAmount: Float!
   id: Float!
-  isExpired: Boolean!
   isReserved: Boolean!
+  isReviewCompleted: Boolean!
   location: String!
   platformName: String!
   reservationDate: DateTime
@@ -44,6 +44,15 @@ input CheckPasswordInput {
 }
 
 type CheckPasswordOutput {
+  error: String
+  ok: Boolean!
+}
+
+input CompleteReviewAndEndCampaignInput {
+  campaignId: Float!
+}
+
+type CompleteReviewAndEndCampaignOutput {
   error: String
   ok: Boolean!
 }
@@ -226,6 +235,7 @@ type Mutation {
   checkEmail(input: CheckEmailInput!): CheckEmailOutput!
   checkNickname(input: CheckNicknameInput!): CheckNicknameOutput!
   checkPassword(input: CheckPasswordInput!): CheckPasswordOutput!
+  completeReviewAndEndCampaign(input: CompleteReviewAndEndCampaignInput!): CompleteReviewAndEndCampaignOutput!
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
   createCampaignDirectly(input: CreateCampaignDirectlyInput!): CreateCampaignDirectlyOutput!
   createCampaignFromLink(input: CreateCampaignFromLinkInput!): CreateCampaignFromLinkOutput!
@@ -240,7 +250,6 @@ type Mutation {
   refreshToken: LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
   sendVerifyEmail(input: SendVerifyEmailInput!): SendVerifyEmailOutput!
-  toggleExpiredCampaign(input: ToggleExpiredInput!): ToggleExpiredOutput!
   verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
 }
 
@@ -270,15 +279,6 @@ input SendVerifyEmailInput {
 }
 
 type SendVerifyEmailOutput {
-  error: String
-  ok: Boolean!
-}
-
-input ToggleExpiredInput {
-  campaignId: Float!
-}
-
-type ToggleExpiredOutput {
   error: String
   ok: Boolean!
 }

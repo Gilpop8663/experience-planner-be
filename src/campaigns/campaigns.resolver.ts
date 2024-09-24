@@ -39,9 +39,9 @@ import {
   CreateGangnamCampaignOutput,
 } from './dtos/create-gangnam-campaign';
 import {
-  ToggleExpiredInput,
-  ToggleExpiredOutput,
-} from './dtos/toggle-expired-campaign.dto';
+  CompleteReviewAndEndCampaignInput,
+  CompleteReviewAndEndCampaignOutput,
+} from './dtos/complete-review-and-end-campaign.dto';
 @Resolver()
 export class CampaignsResolver {
   constructor(private readonly campaignService: CampaignsService) {}
@@ -71,9 +71,11 @@ export class CampaignsResolver {
     return this.campaignService.editCampaign(input);
   }
 
-  @Mutation(() => ToggleExpiredOutput)
-  toggleExpiredCampaign(@Args('input') input: ToggleExpiredInput) {
-    return this.campaignService.toggleExpiredCampaign(input);
+  @Mutation(() => CompleteReviewAndEndCampaignOutput)
+  completeReviewAndEndCampaign(
+    @Args('input') input: CompleteReviewAndEndCampaignInput,
+  ) {
+    return this.campaignService.completeReviewAndEndCampaign(input);
   }
 
   @Query(() => GetCalendarCampaignListOutput)

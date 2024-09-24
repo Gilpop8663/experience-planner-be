@@ -575,17 +575,17 @@ test('총 협찬 비용과 총 소비한 금액을 불러온다.', async () => {
     });
 });
 
-test('캠페인의 종료 상태를 변경할 수 있다. ', async () => {
+test('캠페인에 대해 리뷰 완료 했다면 종료 상태를 변경할 수 있다. ', async () => {
   const [campaign] = await campaignRepository.find();
 
-  expect(campaign.isExpired).toBe(false);
+  expect(campaign.isReviewCompleted).toBe(false);
 
   await request(app.getHttpServer())
     .post(GRAPHQL_ENDPOINT)
     .send({
       query: /* GraphQL */ `
     mutation {
-      toggleExpiredCampaign(input: { campaignId : ${campaign.id}}) {
+      completeReviewAndEndCampaign(input: { campaignId : ${campaign.id}}) {
         ok
         error
       }
@@ -596,17 +596,17 @@ test('캠페인의 종료 상태를 변경할 수 있다. ', async () => {
     .expect((res) => {
       const {
         body: {
-          data: { toggleExpiredCampaign },
+          data: { completeReviewAndEndCampaign },
         },
       } = res;
 
-      expect(toggleExpiredCampaign.ok).toBe(true);
-      expect(toggleExpiredCampaign.error).toBe(null);
+      expect(completeReviewAndEndCampaign.ok).toBe(true);
+      expect(completeReviewAndEndCampaign.error).toBe(null);
     });
 
   const expiredCampaign = await campaignRepository.findOne({
     where: { id: campaign.id },
   });
 
-  expect(expiredCampaign.isExpired).toBe(true);
+  expect(expiredCampaign.isReviewCompleted).toBe(true);
 });

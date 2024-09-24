@@ -52,9 +52,9 @@ import {
   parseGangnamContent,
 } from './utils';
 import {
-  ToggleExpiredInput,
-  ToggleExpiredOutput,
-} from './dtos/toggle-expired-campaign.dto';
+  CompleteReviewAndEndCampaignInput,
+  CompleteReviewAndEndCampaignOutput,
+} from './dtos/complete-review-and-end-campaign.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -439,7 +439,10 @@ export class CampaignsService {
       const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
-        where: { reviewDeadline: MoreThan(currentDate), isExpired: false },
+        where: {
+          reviewDeadline: MoreThan(currentDate),
+          isReviewCompleted: false,
+        },
         order: { reviewDeadline: 'ASC', createdAt: 'ASC' },
       });
 
@@ -462,7 +465,10 @@ export class CampaignsService {
       const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
-        where: [{ reviewDeadline: LessThan(currentDate) }, { isExpired: true }],
+        where: [
+          { reviewDeadline: LessThan(currentDate) },
+          { isReviewCompleted: true },
+        ],
         order: { reviewDeadline: 'DESC', createdAt: 'ASC' },
       });
 
@@ -588,9 +594,9 @@ export class CampaignsService {
     }
   }
 
-  async toggleExpiredCampaign({
+  async completeReviewAndEndCampaign({
     campaignId,
-  }: ToggleExpiredInput): Promise<ToggleExpiredOutput> {
+  }: CompleteReviewAndEndCampaignInput): Promise<CompleteReviewAndEndCampaignOutput> {
     try {
       const campaign = await this.campaignRepository.findOne({
         where: { id: campaignId },
@@ -600,10 +606,8 @@ export class CampaignsService {
         return { ok: false, error: '캠페인을 찾을 수 없습니다.' };
       }
 
-      const newExpiredStatus = !campaign.isExpired;
-
       await this.campaignRepository.update(campaignId, {
-        isExpired: newExpiredStatus,
+        isReviewCompleted: true,
       });
 
       return { ok: true };

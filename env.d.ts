@@ -13,5 +13,6 @@ declare module NodeJS {
     DATABASE_URL: string;
     SOLAPI_API_KEY: string;
     SOLAPI_API_SECRET_KEY: string;
+    ADMIN_PASSWORD: string;
   }
 }

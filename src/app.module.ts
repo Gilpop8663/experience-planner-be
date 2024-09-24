@@ -21,6 +21,8 @@ import { MailModule } from './mail/mail.module';
 import { PasswordResetToken } from './users/entities/passwordResetToken.entity';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { Campaign } from './campaigns/entities/campaign.entity';
+import { UsersService } from './users/users.service';
+import { AdminModule } from './admin/admin.module';
 
 const getEnvFilePath = () => {
   if (process.env.NODE_ENV === 'dev') {
@@ -78,7 +80,7 @@ const getEnvFilePath = () => {
       sortSchema: true,
       context: ({ req, res }) => ({ user: req['user'], req, res }),
       introspection: true,
-      playground: true,
+      playground: false,
       formatError: (error) => {
         console.log(error);
         return {
@@ -98,15 +100,22 @@ const getEnvFilePath = () => {
       domain: process.env.MAILGUN_DOMAIN_NAME,
     }),
     CampaignsModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],
 })
 export class AppModule implements NestModule {
+  constructor(private readonly usersService: UsersService) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleware).forRoutes({
       path: '*',
       method: RequestMethod.ALL,
     });
+  }
+
+  async onModuleInit() {
+    await this.usersService.createAdminUser();
   }
 }

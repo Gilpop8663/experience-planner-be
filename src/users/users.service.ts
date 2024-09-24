@@ -1,7 +1,7 @@
 import { Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -116,6 +116,8 @@ export class UsersService {
         };
       }
 
+      await this.updateLastActive(user.id);
+
       // 액세스 토큰 생성 (1시간 만료)
       const accessToken = this.jwtService.sign(
         { id: user.id },
@@ -152,14 +154,18 @@ export class UsersService {
   async refreshToken(refreshToken: string, @Res() res: Response) {
     try {
       const decoded = this.jwtService.verify(refreshToken);
-      const result = await this.getUserProfile(decoded['id']);
+      const result = await this.getUserProfile({ userId: decoded['id'] });
+
       if (!result.user) {
         return { ok: false, error: '사용자를 찾을 수 없습니다.' };
       }
+
       const newAccessToken = this.jwtService.sign(
         { id: result.user.id },
         { expiresIn: '1h' },
       );
+
+      await this.updateLastActive(result.user.id);
 
       const rememberMe = decoded['rememberMe'];
 
@@ -453,5 +459,42 @@ export class UsersService {
     } catch (error) {
       return logErrorAndReturnFalse(error, '비밀번호 확인에 실패했습니다.');
     }
+  }
+
+  async createAdminUser() {
+    try {
+      const ADMIN_EMAIL = 'admin@coddink.com';
+      const adminExists = await this.users.findOne({
+        where: { email: ADMIN_EMAIL },
+      });
+
+      if (adminExists) {
+        return;
+      }
+
+      const newAdmin = this.users.create({
+        email: ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD,
+        nickname: '관리자',
+        role: UserRole.ADMIN,
+      });
+
+      await this.users.save(newAdmin);
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: '어드민 생성에 실패했습니다.' };
+    }
+  }
+
+  async updateLastActive(userId: number) {
+    const user = await this.users.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    await this.users.update(userId, { lastActive: new Date() });
+    return { ok: true };
   }
 }

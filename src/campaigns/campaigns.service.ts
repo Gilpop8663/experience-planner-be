@@ -405,10 +405,10 @@ export class CampaignsService {
     }
   }
 
-  async getCalendarCampaignList({
-    year,
-    month,
-  }: GetCalendarCampaignListInput): Promise<GetCalendarCampaignListOutput> {
+  async getCalendarCampaignList(
+    { year, month }: GetCalendarCampaignListInput,
+    userId: number,
+  ): Promise<GetCalendarCampaignListOutput> {
     try {
       const startDate = new Date(year, month - 1, 1, 0, 0, 0);
       const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
@@ -416,6 +416,7 @@ export class CampaignsService {
       const campaign = await this.campaignRepository.find({
         where: {
           reviewDeadline: Between(startDate, endDate),
+          user: { id: userId },
         },
         order: { reviewDeadline: 'ASC' },
       });
@@ -434,7 +435,9 @@ export class CampaignsService {
     }
   }
 
-  async getCampaignListSortedByDeadline(): Promise<GetCampaignListSortedByDeadlineOutput> {
+  async getCampaignListSortedByDeadline(
+    userId: number,
+  ): Promise<GetCampaignListSortedByDeadlineOutput> {
     try {
       const currentDate = new Date();
 
@@ -442,6 +445,7 @@ export class CampaignsService {
         where: {
           reviewDeadline: MoreThan(currentDate),
           isReviewCompleted: false,
+          user: { id: userId },
         },
         order: { reviewDeadline: 'ASC', createdAt: 'ASC' },
       });
@@ -460,14 +464,26 @@ export class CampaignsService {
     }
   }
 
-  async getExpiredCampaignListSortedByDeadline(): Promise<GetExpiredCampaignListSortedByDeadlineOutput> {
+  async getExpiredCampaignListSortedByDeadline(
+    userId: number,
+  ): Promise<GetExpiredCampaignListSortedByDeadlineOutput> {
     try {
       const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
         where: [
-          { reviewDeadline: LessThan(currentDate) },
-          { isReviewCompleted: true },
+          {
+            reviewDeadline: LessThan(currentDate),
+            user: {
+              id: userId,
+            },
+          },
+          {
+            isReviewCompleted: true,
+            user: {
+              id: userId,
+            },
+          },
         ],
         order: { reviewDeadline: 'DESC', createdAt: 'ASC' },
       });

@@ -14,6 +14,18 @@ import { IsEmail, IsNumber, Length } from 'class-validator';
 import { PasswordResetToken } from './passwordResetToken.entity';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 
+import { registerEnumType } from '@nestjs/graphql';
+
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+
+// GraphQL enum 타입으로 등록
+registerEnumType(UserRole, {
+  name: 'UserRole', // 이 이름은 GraphQL 스키마에서 사용됩니다.
+});
+
 @InputType({ isAbstract: true })
 @ObjectType()
 @Entity()
@@ -38,6 +50,17 @@ export class User extends CoreEntity {
   @Field(() => String)
   @Length(2, 20)
   nickname: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  @Field(() => UserRole)
+  role: UserRole;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastActive: Date;
 
   @Field(() => [Campaign])
   @OneToMany(() => Campaign, (campaign) => campaign.user)

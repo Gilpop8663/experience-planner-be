@@ -79,18 +79,24 @@ export class CampaignsResolver {
   }
 
   @Query(() => GetCalendarCampaignListOutput)
-  getCalendarCampaignList(@Args('input') input: GetCalendarCampaignListInput) {
-    return this.campaignService.getCalendarCampaignList(input);
+  @UseGuards(AuthGuard)
+  getCalendarCampaignList(
+    @Args('input') input: GetCalendarCampaignListInput,
+    @AuthUser() user: User,
+  ) {
+    return this.campaignService.getCalendarCampaignList(input, user.id);
   }
 
   @Query(() => GetCalendarCampaignListOutput)
-  getCampaignListSortedByDeadline() {
-    return this.campaignService.getCampaignListSortedByDeadline();
+  @UseGuards(AuthGuard)
+  getCampaignListSortedByDeadline(@AuthUser() user: User) {
+    return this.campaignService.getCampaignListSortedByDeadline(user.id);
   }
 
   @Query(() => GetExpiredCampaignListSortedByDeadlineOutput)
-  getExpiredCampaignListSortedByDeadline() {
-    return this.campaignService.getExpiredCampaignListSortedByDeadline();
+  @UseGuards(AuthGuard)
+  getExpiredCampaignListSortedByDeadline(@AuthUser() user: User) {
+    return this.campaignService.getExpiredCampaignListSortedByDeadline(user.id);
   }
 
   @Query(() => GetCampaignDetailOutPut)

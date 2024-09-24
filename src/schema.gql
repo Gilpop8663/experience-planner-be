@@ -173,6 +173,12 @@ type ForgotPasswordOutput {
   ok: Boolean!
 }
 
+type GetActiveUserCountOutput {
+  count: Float
+  error: String
+  ok: Boolean!
+}
+
 input GetCalendarCampaignListInput {
   month: Float!
   year: Float!
@@ -219,6 +225,12 @@ type GetTotalSponsorshipCostAndConsumptionOutput {
   totalSponsorshipCost: Float
 }
 
+type GetUserCountOutput {
+  count: Float
+  error: String
+  ok: Boolean!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -254,12 +266,14 @@ type Mutation {
 }
 
 type Query {
+  getActiveUserCount: GetActiveUserCountOutput!
   getCalendarCampaignList(input: GetCalendarCampaignListInput!): GetCalendarCampaignListOutput!
   getCampaignDetail(input: GetCampaignDetailInput!): GetCampaignDetailOutPut!
   getCampaignListSortedByDeadline: GetCalendarCampaignListOutput!
   getExpiredCampaignListSortedByDeadline: GetExpiredCampaignListSortedByDeadlineOutput!
   getSponsorshipCostAndConsumption(input: GetSponsorshipCostAndConsumptionInput!): GetSponsorshipCostAndConsumptionOutput!
   getTotalSponsorshipCostAndConsumption: GetTotalSponsorshipCostAndConsumptionOutput!
+  getUserCount: GetUserCountOutput!
   getUserProfile(input: UserProfileInput!): UserProfileOutput!
   me: User!
 }
@@ -291,6 +305,7 @@ type User {
   nickname: String!
   password: String!
   point: Float!
+  role: UserRole!
   updatedAt: DateTime!
 }
 
@@ -302,6 +317,11 @@ type UserProfileOutput {
   error: String
   ok: Boolean!
   user: User
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
 
 input VerifyEmailInput {

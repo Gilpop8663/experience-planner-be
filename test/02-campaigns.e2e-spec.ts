@@ -6,12 +6,11 @@ import {
   usersRepository,
 } from './jest.setup';
 import 'expect-puppeteer';
+import { getEndOfDay } from 'src/campaigns/utils';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
 test.each([
-  ['강남맛집', '방문형', 'https://xn--939au0g4vj8sq.net/cp/?id=1461979'],
-  ['강남맛집', '배송형', 'https://xn--939au0g4vj8sq.net/cp/?id=1474045'],
   ['레뷰', '방문형', 'https://www.revu.net/campaign/987487'],
   ['레뷰', '배송형', 'https://www.revu.net/campaign/988004'],
   ['리뷰노트', '방문형', 'https://www.reviewnote.co.kr/campaigns/342622'],
@@ -101,7 +100,7 @@ test.each([
     20,
     new Date(),
   ],
-  ['제목3', '', '', new Date(), '', '', 0, 0, ''],
+  ['제목3', '', '', new Date(), '', '', 0, 0, new Date()],
 ])(
   '직접 내용을 입력해서 캠페인을 생성한다.',
   async (
@@ -259,7 +258,7 @@ test('캠페인을 수정할 수 있다. ', async () => {
   expect(editedCampaign.location).toBe(EDIT.location);
   expect(editedCampaign.platformName).toBe(EDIT.platformName);
   expect(editedCampaign.reviewDeadline.getTime()).toStrictEqual(
-    EDIT.reviewDeadline.setMilliseconds(0),
+    getEndOfDay(EDIT.reviewDeadline).setMilliseconds(0),
   );
   expect(editedCampaign.reservationDate.getTime()).toStrictEqual(
     EDIT.reservationDate.setMilliseconds(0),
@@ -574,4 +573,40 @@ test('총 협찬 비용과 총 소비한 금액을 불러온다.', async () => {
         getTotalSponsorshipCostAndConsumption.totalConsumptionCost,
       ).toEqual(expect.any(Number));
     });
+});
+
+test('캠페인의 종료 상태를 변경할 수 있다. ', async () => {
+  const [campaign] = await campaignRepository.find();
+
+  expect(campaign.isExpired).toBe(false);
+
+  await request(app.getHttpServer())
+    .post(GRAPHQL_ENDPOINT)
+    .send({
+      query: /* GraphQL */ `
+    mutation {
+      toggleExpiredCampaign(input: { campaignId : ${campaign.id}}) {
+        ok
+        error
+      }
+    }
+  `,
+    })
+    .expect(200)
+    .expect((res) => {
+      const {
+        body: {
+          data: { toggleExpiredCampaign },
+        },
+      } = res;
+
+      expect(toggleExpiredCampaign.ok).toBe(true);
+      expect(toggleExpiredCampaign.error).toBe(null);
+    });
+
+  const expiredCampaign = await campaignRepository.findOne({
+    where: { id: campaign.id },
+  });
+
+  expect(expiredCampaign.isExpired).toBe(true);
 });

@@ -7,6 +7,7 @@ type Campaign {
   detailedViewLink: String!
   extraAmount: Float!
   id: Float!
+  isExpired: Boolean!
   isReserved: Boolean!
   location: String!
   platformName: String!
@@ -239,6 +240,7 @@ type Mutation {
   refreshToken: LoginOutput!
   resetPassword(input: ResetPasswordInput!): ResetPasswordOutput!
   sendVerifyEmail(input: SendVerifyEmailInput!): SendVerifyEmailOutput!
+  toggleExpiredCampaign(input: ToggleExpiredInput!): ToggleExpiredOutput!
   verifyEmail(input: VerifyEmailInput!): VerifyEmailOutput!
 }
 
@@ -268,6 +270,15 @@ input SendVerifyEmailInput {
 }
 
 type SendVerifyEmailOutput {
+  error: String
+  ok: Boolean!
+}
+
+input ToggleExpiredInput {
+  campaignId: Float!
+}
+
+type ToggleExpiredOutput {
   error: String
   ok: Boolean!
 }

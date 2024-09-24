@@ -51,6 +51,10 @@ import {
   getPlatformName,
   parseGangnamContent,
 } from './utils';
+import {
+  ToggleExpiredInput,
+  ToggleExpiredOutput,
+} from './dtos/toggle-expired-campaign.dto';
 
 @Injectable()
 export class CampaignsService {
@@ -410,7 +414,9 @@ export class CampaignsService {
       const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
 
       const campaign = await this.campaignRepository.find({
-        where: { reviewDeadline: Between(startDate, endDate) },
+        where: {
+          reviewDeadline: Between(startDate, endDate),
+        },
         order: { reviewDeadline: 'ASC' },
       });
 
@@ -433,7 +439,7 @@ export class CampaignsService {
       const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
-        where: { reviewDeadline: MoreThan(currentDate) },
+        where: { reviewDeadline: MoreThan(currentDate), isExpired: false },
         order: { reviewDeadline: 'ASC', createdAt: 'ASC' },
       });
 
@@ -456,7 +462,7 @@ export class CampaignsService {
       const currentDate = new Date();
 
       const campaign = await this.campaignRepository.find({
-        where: { reviewDeadline: LessThan(currentDate) },
+        where: [{ reviewDeadline: LessThan(currentDate) }, { isExpired: true }],
         order: { reviewDeadline: 'DESC', createdAt: 'ASC' },
       });
 
@@ -578,6 +584,33 @@ export class CampaignsService {
       return logErrorAndReturnFalse(
         error,
         '캠페인 제공받은 금액 및 소비 금액을 불러오는 데 실패했습니다.',
+      );
+    }
+  }
+
+  async toggleExpiredCampaign({
+    campaignId,
+  }: ToggleExpiredInput): Promise<ToggleExpiredOutput> {
+    try {
+      const campaign = await this.campaignRepository.findOne({
+        where: { id: campaignId },
+      });
+
+      if (!campaign) {
+        return { ok: false, error: '캠페인을 찾을 수 없습니다.' };
+      }
+
+      const newExpiredStatus = !campaign.isExpired;
+
+      await this.campaignRepository.update(campaignId, {
+        isExpired: newExpiredStatus,
+      });
+
+      return { ok: true };
+    } catch (error) {
+      return logErrorAndReturnFalse(
+        error,
+        '캠페인 상태를 변경하는데 실패했습니다.',
       );
     }
   }

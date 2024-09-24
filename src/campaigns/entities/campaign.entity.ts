@@ -31,6 +31,10 @@ export class Campaign extends CoreEntity {
   @Field(() => Boolean)
   isReserved: boolean;
 
+  @Column({ default: false })
+  @Field(() => Boolean)
+  isExpired: boolean;
+
   @Column({ default: null, nullable: true })
   @Field(() => Date, { nullable: true })
   reservationDate: Date;

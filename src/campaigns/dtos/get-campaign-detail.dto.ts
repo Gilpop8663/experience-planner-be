@@ -12,4 +12,7 @@ export class GetCampaignDetailInput {
 export class GetCampaignDetailOutPut extends CoreOutput {
   @Field(() => Campaign, { nullable: true })
   data?: Campaign;
+
+  @Field(() => [Campaign], { nullable: true })
+  nearByCampaign?: Campaign[];
 }

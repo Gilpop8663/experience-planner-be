@@ -301,6 +301,12 @@ test('캠페인 상세 정보를 불러올 수 있다. ', async () => {
               serviceAmount
               extraAmount
             }
+            nearByCampaign{
+              id
+              title
+              location
+              reviewDeadline
+            }
           }
         }
       `,
@@ -331,6 +337,8 @@ test('캠페인 상세 정보를 불러올 수 있다. ', async () => {
       expect(campaignDetail.serviceDetails).toBe(campaign.serviceDetails);
       expect(campaignDetail.serviceAmount).toBe(campaign.serviceAmount);
       expect(campaignDetail.extraAmount).toBe(campaign.extraAmount);
+
+      expect(getCampaignDetail.nearByCampaign).toEqual(expect.any(Array));
     });
 });
 

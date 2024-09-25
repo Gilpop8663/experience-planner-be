@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Between, LessThan, MoreThan, Repository } from 'typeorm';
+import {
+  Between,
+  IsNull,
+  LessThan,
+  Like,
+  MoreThan,
+  Not,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { logErrorAndReturnFalse } from 'src/utils';
@@ -525,12 +533,42 @@ export class CampaignsService {
         };
       }
 
+      const currentDate = new Date();
+
+      const [province, district] = campaign.location.split(' '); // 예: '서울 강남구 ~~대로 358'
+      const specificLocation = `${province} ${district}`;
+      const generalLocation = province;
+
+      // 특정 지역으로 검색
+      let nearByCampaign = await this.campaignRepository.find({
+        where: {
+          location: Like(`%${specificLocation}%`), // '서울 강남구'가 포함된 캠페인 찾기
+          reviewDeadline: MoreThan(currentDate),
+          isReviewCompleted: false,
+          user: { id: userId },
+          reservationDate: Not(IsNull()),
+        },
+      });
+
+      // 특정 지역이 없을 경우 일반 지역으로 검색
+      if (nearByCampaign.length === 0) {
+        nearByCampaign = await this.campaignRepository.find({
+          where: {
+            location: Like(`%${generalLocation}%`), // '서울'이 포함된 캠페인 찾기
+            reviewDeadline: MoreThan(currentDate),
+            isReviewCompleted: false,
+            user: { id: userId },
+            reservationDate: Not(IsNull()),
+          },
+        });
+      }
+
       const formattedCampaign = {
         ...campaign,
         isReserved: campaign.reservationDate ? true : false,
       };
 
-      return { ok: true, data: formattedCampaign };
+      return { ok: true, data: formattedCampaign, nearByCampaign };
     } catch (error) {
       return logErrorAndReturnFalse(
         error,

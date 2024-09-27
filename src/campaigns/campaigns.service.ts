@@ -53,12 +53,7 @@ import {
   CreateGangnamCampaignInput,
   CreateGangnamCampaignOutput,
 } from './dtos/create-gangnam-campaign';
-import {
-  getDeadlineDate,
-  getEndOfDay,
-  getPlatformName,
-  parseGangnamContent,
-} from './utils';
+import { getDeadlineDate, getPlatformName, parseGangnamContent } from './utils';
 import {
   CompleteReviewAndEndCampaignInput,
   CompleteReviewAndEndCampaignOutput,
@@ -94,7 +89,7 @@ export class CampaignsService {
 
       const campaign = this.campaignRepository.create({
         title,
-        reviewDeadline: getEndOfDay(reviewDeadline),
+        reviewDeadline,
         thumbnailUrl: '',
         location,
         platformName,
@@ -177,7 +172,7 @@ export class CampaignsService {
         thumbnailUrl: '',
         platformName: PLATFORM_NAME.강남맛집,
         user,
-        detailedViewLink: 'https://xn--939au0g4vj8sq.net/mypage/index.php',
+        detailedViewLink: 'https://xn--939au0g4vj8sq.net/',
       });
 
       // 4. 캠페인 저장
@@ -390,9 +385,7 @@ export class CampaignsService {
         extraAmount,
         serviceDetails,
         serviceAmount,
-        reviewDeadline: reviewDeadline
-          ? getEndOfDay(reviewDeadline)
-          : undefined,
+        reviewDeadline: reviewDeadline ? reviewDeadline : undefined,
         detailedViewLink,
         reservationDate:
           new Date(reservationDate).toISOString() === '1970-01-01T00:00:00.000Z'
@@ -546,7 +539,7 @@ export class CampaignsService {
           reviewDeadline: MoreThan(currentDate),
           isReviewCompleted: false,
           user: { id: userId },
-          reservationDate: Not(IsNull()),
+          reservationDate: IsNull(),
         },
       });
 

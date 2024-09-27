@@ -6,7 +6,6 @@ import {
   usersRepository,
 } from './jest.setup';
 import 'expect-puppeteer';
-import { getEndOfDay } from 'src/campaigns/utils';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
@@ -258,7 +257,7 @@ test('캠페인을 수정할 수 있다. ', async () => {
   expect(editedCampaign.location).toBe(EDIT.location);
   expect(editedCampaign.platformName).toBe(EDIT.platformName);
   expect(editedCampaign.reviewDeadline.getTime()).toStrictEqual(
-    getEndOfDay(EDIT.reviewDeadline).setMilliseconds(0),
+    EDIT.reviewDeadline.setMilliseconds(0),
   );
   expect(editedCampaign.reservationDate.getTime()).toStrictEqual(
     EDIT.reservationDate.setMilliseconds(0),

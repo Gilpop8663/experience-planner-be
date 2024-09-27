@@ -411,8 +411,8 @@ export class CampaignsService {
     userId: number,
   ): Promise<GetCalendarCampaignListOutput> {
     try {
-      const startDate = new Date(year, month - 1, 1, 0, 0, 0);
-      const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
+      const startDate = new Date(Date.UTC(year, month - 1, 0, 15, 0, 0)); // 9월 1일 00:00:00 KST는 UTC로 8월 31일 15:00:00
+      const endDate = new Date(Date.UTC(year, month, 0, 14, 59, 59)); // 9월 30일 23:59:59 KST는 UTC로 9월 30일 14:59:59
 
       const campaign = await this.campaignRepository.find({
         where: {
@@ -575,8 +575,8 @@ export class CampaignsService {
     userId: number,
   ): Promise<GetSponsorshipCostAndConsumptionOutput> {
     try {
-      const startDate = new Date(year, month - 1, 1, 0, 0, 0);
-      const endDate = new Date(year, month, 0, 23, 59, 59); // 해당 월의 마지막 날 23:59:59
+      const startDate = new Date(Date.UTC(year, month - 1, 0, 15, 0, 0)); // 9월 1일 00:00:00 KST는 UTC로 8월 31일 15:00:00
+      const endDate = new Date(Date.UTC(year, month, 0, 14, 59, 59)); // 9월 30일 23:59:59 KST는 UTC로 9월 30일 14:59:59
 
       const campaignList = await this.campaignRepository.find({
         where: {

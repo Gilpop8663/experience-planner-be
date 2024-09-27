@@ -15,8 +15,12 @@ export const getDeadlineDate = (dateString: string) => {
   const currentYear = new Date().getFullYear(); // 현재 연도
 
   // Date 객체 생성
-  const startDate = new Date(currentYear, prevMonth - 1, prevDay, 23, 59, 59); // 월은 0부터 시작하므로 -1
-  const endDate = new Date(currentYear, nextMonth - 1, nextDay, 23, 59, 59); // 월은 0부터 시작하므로 -1
+  const startDate = new Date(
+    Date.UTC(currentYear, prevMonth - 1, prevDay, 14, 59, 59),
+  ); // 14시 = 한국 시간 23시
+  const endDate = new Date(
+    Date.UTC(currentYear, nextMonth - 1, nextDay, 14, 59, 59),
+  ); // 14시 = 한국 시간 23시
 
   // 만약 endDate가 오늘 날짜보다 이전이라면, 다음 연도로 설정
   if (endDate < startDate) {

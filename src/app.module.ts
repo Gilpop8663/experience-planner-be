@@ -23,6 +23,7 @@ import { CampaignsModule } from './campaigns/campaigns.module';
 import { Campaign } from './campaigns/entities/campaign.entity';
 import { UsersService } from './users/users.service';
 import { AdminModule } from './admin/admin.module';
+import * as fs from 'fs';
 
 const getEnvFilePath = () => {
   if (process.env.NODE_ENV === 'dev') {
@@ -73,6 +74,20 @@ const getEnvFilePath = () => {
       entities: [User, Verification, PasswordResetToken, Campaign],
       logging: process.env.NODE_ENV === 'dev',
       synchronize: true,
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? {
+              // 다운로드한 인증서 파일 경로 추가
+              ca: fs.readFileSync('/global-bundle.pem'),
+            }
+          : false,
+      extra: {
+        // SSL 연결을 강제 설정
+        ssl:
+          process.env.NODE_ENV === 'production'
+            ? { rejectUnauthorized: false }
+            : false,
+      },
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

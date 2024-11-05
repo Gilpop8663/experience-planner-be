@@ -43,7 +43,7 @@ const getEnvFilePath = () => {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      ignoreEnvFile: false,
       envFilePath: getEnvFilePath(),
       validationSchema: Joi.object({
         NODE_ENV: Joi.string()
@@ -80,7 +80,7 @@ const getEnvFilePath = () => {
       sortSchema: true,
       context: ({ req, res }) => ({ user: req['user'], req, res }),
       introspection: true,
-      playground: false,
+      playground: true,
       formatError: (error) => {
         console.log(error);
         return {

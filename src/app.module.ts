@@ -78,7 +78,7 @@ const getEnvFilePath = () => {
         process.env.NODE_ENV === 'production'
           ? {
               // 다운로드한 인증서 파일 경로 추가
-              ca: fs.readFileSync('/global-bundle.pem'),
+              ca: fs.readFileSync('./global-bundle.pem'),
             }
           : false,
       extra: {
